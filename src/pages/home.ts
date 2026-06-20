@@ -5,16 +5,20 @@
 import { getSettings, saveSettings, getAll, getById, put, getSchedulesByLine } from '../db/database';
 import { Preset, TripRecord, BusLine, BusStop, Schedule } from '../types';
 import { findNextBus, minutesUntilArrival } from '../services/prediction';
-import { currentTime, currentDate, formatMinutes, timeDiffMinutes } from '../utils/time';
+import { currentTime, currentDate, formatMinutes, timeDiffMinutes, addMinutes } from '../utils/time';
 import { generateId, detectDayType } from '../utils/helpers';
 import { renderCountdown } from '../components/countdown';
 import { renderConfidence } from '../components/confidence';
 import { showToast } from '../components/toast';
 import { renderThemeToggle, initThemeToggle } from '../components/theme-toggle';
 import { setCountdownInterval } from '../main';
+import { getIcon } from '../components/icons';
 
 // Guarda o ID do registro de viagem em andamento
 let activeTripRecord: TripRecord | null = null;
+
+// Objeto na memória para evitar múltiplos disparos de notificação para a mesma viagem no mesmo dia
+const notifiedTrips: Record<string, boolean> = {};
 
 /**
  * Renderiza o HTML esqueleto da página Home.
@@ -27,16 +31,21 @@ export async function renderHomePage(): Promise<string> {
   return `
     <div class="app-header">
       <div class="app-title">
-        <span>🚌 Bus<span class="app-title-accent">Tracker</span></span>
+        <span>${getIcon('bus', 24, 'app-title-icon')} Bus<span class="app-title-accent">Tracker</span></span>
       </div>
       ${themeToggleHtml}
     </div>
 
     <div class="card" style="margin-bottom: 20px; padding: 12px 16px;">
       <label class="label" for="preset-selector">Trajeto Ativo</label>
-      <select class="select" id="preset-selector" style="margin-bottom: 0;">
-        <option value="none">Carregando trajetos...</option>
-      </select>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <select class="select" id="preset-selector" style="margin-bottom: 0; flex: 1;">
+          <option value="none">Carregando trajetos...</option>
+        </select>
+        <button id="btn-notify-toggle" class="btn-icon" title="Ativar Alertas de Chegada">
+          ${getIcon('bellOff', 20)}
+        </button>
+      </div>
     </div>
 
     <div id="home-tracker-content">
@@ -47,14 +56,15 @@ export async function renderHomePage(): Promise<string> {
 
 /**
  * Inicializa a lógica da página Home.
- * Popula o seletor de presets, escuta mudanças e inicia o intervalo do timer.
+ * Popula o seletor de presets, escuta mudanças, registra as notificações e inicia o intervalo do timer.
  */
 export async function initHomePage(): Promise<void> {
   // Inicializa o alternador de temas no cabeçalho
   initThemeToggle();
 
   const presetSelector = document.getElementById('preset-selector') as HTMLSelectElement;
-  if (!presetSelector) return;
+  const btnNotifyToggle = document.getElementById('btn-notify-toggle') as HTMLButtonElement;
+  if (!presetSelector || !btnNotifyToggle) return;
 
   // Busca presets e configurações
   const presets = await getAll<Preset>('presets');
@@ -65,15 +75,19 @@ export async function initHomePage(): Promise<void> {
 
   if (presets.length === 0) {
     presetSelector.innerHTML = '<option value="none">Nenhum trajeto salvo</option>';
+    btnNotifyToggle.style.display = 'none';
     renderEmptyState();
     return;
   }
+
+  btnNotifyToggle.style.display = 'flex';
 
   // Preenche o dropdown de trajetos salvos
   presets.forEach(preset => {
     const option = document.createElement('option');
     option.value = preset.id;
-    option.textContent = `${preset.icon} ${preset.name}`;
+    // O helper getIcon lida com emojis antigos se houver no banco
+    option.textContent = preset.name;
     if (settings.activePresetId === preset.id) {
       option.selected = true;
     }
@@ -84,18 +98,51 @@ export async function initHomePage(): Promise<void> {
   let activePresetId = settings.activePresetId;
   if (!activePresetId || !presets.some(p => p.id === activePresetId)) {
     activePresetId = presets[0].id;
-    await saveSettings({ activePresetId });
+    await saveSettings({ activePresetId: activePresetId });
     presetSelector.value = activePresetId;
   }
+
+  // Atualiza o estado visual do botão de notificações inicial
+  updateNotifyButtonState(activePresetId);
 
   // Escuta alteração de preset ativo
   presetSelector.addEventListener('change', async () => {
     const selectedId = presetSelector.value;
     await saveSettings({ activePresetId: selectedId });
     
-    // Reseta o registro ativo se mudar de preset
+    // Reseta o registro ativo e atualiza visual do sino
     activeTripRecord = null;
+    updateNotifyButtonState(selectedId);
     await updateTrackerView(selectedId);
+  });
+
+  // Event listener para ativar/desativar notificações nativas do navegador
+  btnNotifyToggle.addEventListener('click', async () => {
+    const currentPresetId = presetSelector.value;
+    if (currentPresetId === 'none') return;
+
+    const isEnabled = localStorage.getItem(`notify-preset-${currentPresetId}`) === 'true';
+
+    if (!isEnabled) {
+      // Solicita permissão se ainda não foi concedida
+      if ('Notification' in window) {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          localStorage.setItem(`notify-preset-${currentPresetId}`, 'true');
+          updateNotifyButtonState(currentPresetId);
+          showToast('Alertas ativados! Avisaremos você 5 min antes.', 'success');
+        } else {
+          showToast('Permissão de notificação negada pelo navegador.', 'error');
+        }
+      } else {
+        showToast('Seu navegador não suporta notificações.', 'error');
+      }
+    } else {
+      // Desativa
+      localStorage.setItem(`notify-preset-${currentPresetId}`, 'false');
+      updateNotifyButtonState(currentPresetId);
+      showToast('Alertas desativados para este trajeto.', 'info');
+    }
   });
 
   // Verifica se há alguma viagem ativa em andamento no IndexedDB
@@ -117,8 +164,32 @@ export async function initHomePage(): Promise<void> {
 }
 
 /**
+ * Atualiza visualmente o ícone e a classe do botão de notificação baseado no preset ativo.
+ */
+function updateNotifyButtonState(presetId: string): void {
+  const btnNotifyToggle = document.getElementById('btn-notify-toggle') as HTMLButtonElement;
+  if (!btnNotifyToggle || presetId === 'none') return;
+
+  const isEnabled = localStorage.getItem(`notify-preset-${presetId}`) === 'true';
+  const hasPermission = 'Notification' in window && Notification.permission === 'granted';
+
+  if (isEnabled && hasPermission) {
+    btnNotifyToggle.innerHTML = getIcon('bell', 20);
+    btnNotifyToggle.classList.add('active');
+    btnNotifyToggle.title = 'Alertas Ativos (Clique para desativar)';
+  } else {
+    btnNotifyToggle.innerHTML = getIcon('bellOff', 20);
+    btnNotifyToggle.classList.remove('active');
+    btnNotifyToggle.title = 'Ativar Alertas de Chegada';
+    if (isEnabled && !hasPermission) {
+      // Se estava habilitado mas perdeu a permissão, desliga
+      localStorage.setItem(`notify-preset-${presetId}`, 'false');
+    }
+  }
+}
+
+/**
  * Busca por uma viagem que tenha sido iniciada hoje e não tenha horário de chegada no destino.
- * Isso permite persistir o estado do botão caso o usuário recarregue a página.
  */
 async function checkForActiveTrip(presetId: string): Promise<void> {
   const records = await getAll<TripRecord>('tripRecords');
@@ -144,13 +215,13 @@ function renderEmptyState(): void {
   if (!container) return;
 
   container.innerHTML = `
-    <div class="card empty-state">
-      <div class="empty-state-icon">🗺️</div>
-      <div class="empty-state-title">Nenhum trajeto configurado</div>
+    <div class="card empty-state" style="padding: 32px 16px;">
+      <div class="empty-state-icon" style="color: var(--accent);">${getIcon('mapPin', 40)}</div>
+      <div class="empty-state-title" style="margin-top: 12px;">Nenhum trajeto configurado</div>
       <div class="empty-state-desc">
         Crie linhas, pontos e configure um trajeto personalizado na aba "Gerenciar" para ver previsões aqui.
       </div>
-      <a href="#manage" class="btn btn-primary">Configurar Trajetos</a>
+      <a href="#manage" class="btn btn-primary" style="margin-top: 16px;">Configurar Trajetos</a>
     </div>
   `;
 }
@@ -200,20 +271,20 @@ async function updateTrackerView(presetId: string): Promise<void> {
   if (!prediction) {
     container.innerHTML = `
       <div class="card">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-          <span style="font-size: 24px;">${preset.icon}</span>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+          <span style="color: var(--accent);">${getIcon(preset.icon, 28)}</span>
           <div>
-            <h2 style="margin-bottom: 2px;">${preset.name}</h2>
+            <h2 style="margin-bottom: 2px; font-size: 16px;">${preset.name}</h2>
             <div style="display: flex; align-items: center; gap: 6px;">
               <span class="record-line-badge" style="background-color: ${line.color};">${line.number}</span>
               <span style="font-size: 12px; color: var(--text-secondary);">${line.name}</span>
             </div>
           </div>
         </div>
-        <div class="empty-state" style="padding: 24px 0;">
-          <div class="empty-state-icon">😴</div>
-          <div class="empty-state-title">Sem viagens agendadas</div>
-          <div class="empty-state-desc">Não há mais ônibus programados na tabela para o dia de hoje.</div>
+        <div class="empty-state" style="padding: 32px 0;">
+          <div class="empty-state-icon" style="color: var(--text-secondary);">${getIcon('clock', 36)}</div>
+          <div class="empty-state-title" style="margin-top: 12px;">Sem ônibus hoje</div>
+          <div class="empty-state-desc">Não há mais ônibus programados na tabela de horários para o dia de hoje nesta linha.</div>
         </div>
       </div>
     `;
@@ -223,19 +294,82 @@ async function updateTrackerView(presetId: string): Promise<void> {
   // Calcula os minutos restantes até a chegada prevista
   const minutesLeft = minutesUntilArrival(prediction);
 
+  // Lógica de Notificações nativas no celular
+  const isNotifEnabled = localStorage.getItem(`notify-preset-${preset.id}`) === 'true';
+  if (isNotifEnabled && 'Notification' in window && Notification.permission === 'granted') {
+    // Alerta disparado quando o ônibus está entre 1 e 5 minutos de distância
+    if (minutesLeft > 0 && minutesLeft <= 5) {
+      const notifiedKey = `${preset.id}-${prediction.scheduledDeparture}-${currentDate()}`;
+      if (!notifiedTrips[notifiedKey]) {
+        notifiedTrips[notifiedKey] = true;
+        new Notification('BusTracker: Ônibus Chegando!', {
+          body: `O ônibus do trajeto "${preset.name}" (Linha ${line.number}) está previsto para chegar em ${minutesLeft} min (às ${prediction.predictedBusArrival}). Vá para o ponto!`,
+          icon: '/favicon.ico'
+        });
+      }
+    }
+  }
+
+  // Calcula margem de segurança (Buffer Time)
+  const buffer = preset.bufferTime ?? 0;
+  const walkTime = preset.estimatedBoardingOffset;
+  const totalOffset = walkTime + buffer;
+  const timeToLeave = addMinutes(prediction.predictedBusArrival, -totalOffset);
+  const minutesToLeave = timeDiffMinutes(currentTime(), timeToLeave);
+
   // Renderiza os componentes de UI
   const countdownHtml = renderCountdown(minutesLeft);
   const confidenceHtml = renderConfidence(prediction.confidence, prediction.recordCount, prediction.reliability);
-
-  // Monta a estrutura da previsão detalhada
   const isTripInProgress = activeTripRecord !== null;
 
+  // Renderização da seção recomendada de saída
+  let leaveHtml = '';
+  if (!isTripInProgress && minutesLeft > 0) {
+    let leaveStatusText = '';
+    let leaveColorStyle = 'var(--success)';
+    let pulseClass = 'pulse-green';
+
+    if (minutesToLeave < 0) {
+      leaveStatusText = 'Atrasado! Vá correndo';
+      leaveColorStyle = 'var(--danger)';
+      pulseClass = 'pulse-red';
+    } else if (minutesToLeave === 0) {
+      leaveStatusText = 'Saia agora!';
+      leaveColorStyle = 'var(--warning)';
+      pulseClass = 'pulse-yellow';
+    } else if (minutesToLeave <= 3) {
+      leaveStatusText = `Saia em ${minutesToLeave} min`;
+      leaveColorStyle = 'var(--warning)';
+      pulseClass = 'pulse-yellow';
+    } else {
+      leaveStatusText = `Saia em ${minutesToLeave} min`;
+      leaveColorStyle = 'var(--success)';
+      pulseClass = 'pulse-green';
+    }
+
+    leaveHtml = `
+      <div class="card countdown-container ${pulseClass}" style="background-color: var(--bg); margin: 0 0 16px 0; padding: 12px 14px; border-radius: var(--radius); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="color: var(--accent); display: flex;">${getIcon('clock', 20)}</span>
+          <div>
+            <span class="label" style="font-size: 9px; margin-bottom: 0; letter-spacing: 0.02em;">Sair de Casa às</span>
+            <strong style="font-size: 15px; color: var(--text);">${timeToLeave}</strong>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <span style="font-size: 10px; color: var(--text-secondary); display: block; margin-bottom: 2px;">Buffer: ${buffer}m | Caminhada: ${walkTime}m</span>
+          <strong style="font-size: 13px; color: ${leaveColorStyle};">${leaveStatusText}</strong>
+        </div>
+      </div>
+    `;
+  }
+
   container.innerHTML = `
-    <div class="card" style="margin-bottom: 16px;">
+    <div class="card" style="margin-bottom: 16px; position: relative;">
       <!-- Cabeçalho do Preset -->
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 28px;">${preset.icon}</span>
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="color: var(--accent); display: flex;">${getIcon(preset.icon, 32)}</span>
           <div>
             <h2 style="margin-bottom: 2px; font-size: 16px; font-weight: 700;">${preset.name}</h2>
             <div style="display: flex; align-items: center; gap: 6px;">
@@ -245,13 +379,13 @@ async function updateTrackerView(presetId: string): Promise<void> {
           </div>
         </div>
         <div style="text-align: right;">
-          <span class="label" style="margin-bottom: 2px; font-size: 10px;">Programado</span>
+          <span class="label" style="margin-bottom: 2px; font-size: 10px;">Tabela</span>
           <span style="font-size: 16px; font-weight: 700; color: var(--text);">${prediction.scheduledDeparture}</span>
         </div>
       </div>
 
       <!-- Barra de Rotas (Origem -> Destino) -->
-      <div style="position: relative; padding-left: 20px; margin-bottom: 16px;">
+      <div style="position: relative; padding-left: 20px; margin-bottom: 18px;">
         <div style="position: absolute; left: 6px; top: 6px; bottom: 6px; width: 2px; background-color: var(--border); display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
           <div style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--accent); margin-left: -3px;"></div>
           <div style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--success); margin-left: -3px;"></div>
@@ -266,17 +400,24 @@ async function updateTrackerView(presetId: string): Promise<void> {
         </div>
       </div>
 
-      <!-- Componente do Contador -->
+      <!-- Componente do Contador Principal -->
       ${countdownHtml}
 
+      <!-- Recomendação de Saída baseada na caminhada + margem de segurança -->
+      ${leaveHtml}
+
       <!-- Horários previstos -->
-      <div class="card" style="background-color: var(--bg); margin: 16px 0 12px 0; padding: 12px; border-radius: var(--radius);">
+      <div class="card" style="background-color: var(--bg); margin: 0 0 14px 0; padding: 12px; border-radius: var(--radius);">
         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span style="font-size: 13px; color: var(--text-secondary);">Previsão no Ponto:</span>
+          <span style="font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
+            ${getIcon('mapPin', 13)} Previsão no Ponto:
+          </span>
           <span style="font-size: 13px; font-weight: 700; color: var(--text);">~${prediction.predictedBusArrival}</span>
         </div>
         <div style="display: flex; justify-content: space-between;">
-          <span style="font-size: 13px; color: var(--text-secondary);">Previsão no Destino:</span>
+          <span style="font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
+            ${getIcon('arrowRight', 13)} Previsão no Destino:
+          </span>
           <span style="font-size: 13px; font-weight: 700; color: var(--success);">
             ${prediction.predictedDestinationArrival ? `~${prediction.predictedDestinationArrival}` : 'Sem histórico'}
           </span>
@@ -290,13 +431,17 @@ async function updateTrackerView(presetId: string): Promise<void> {
     <!-- Botões de Registro -->
     <div style="margin-top: 16px;">
       ${isTripInProgress 
-        ? `<button class="btn btn-success btn-lg" id="btn-arrive-destination" style="box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);">📍 Cheguei no Destino!</button>`
-        : `<button class="btn btn-primary btn-lg" id="btn-bus-arrived" style="box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);">🚌 Ônibus Chegou!</button>`
+        ? `<button class="btn btn-success btn-lg" id="btn-arrive-destination" style="box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25); width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            ${getIcon('check', 18)} Cheguei no Destino!
+           </button>`
+        : `<button class="btn btn-primary btn-lg" id="btn-bus-arrived" style="box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25); width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            ${getIcon('bus', 18)} Ônibus Chegou!
+           </button>`
       }
     </div>
   `;
 
-  // Anexa listeners de eventos aos botões recém-gerados
+  // Anexa listeners de eventos aos botões
   const btnBusArrived = document.getElementById('btn-bus-arrived');
   const btnArriveDestination = document.getElementById('btn-arrive-destination');
 

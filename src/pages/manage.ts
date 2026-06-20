@@ -8,14 +8,15 @@ import { generateId } from '../utils/helpers';
 import { showToast } from '../components/toast';
 import { showModal } from '../components/modal';
 import { exportBackup, importBackup } from '../services/backup';
+import { getIcon } from '../components/icons';
 
 // Estado de edição local para evitar modais complexos
 let editingLineId: string | null = null;
 let editingStopId: string | null = null;
 let editingPresetId: string | null = null;
-let selectedPresetEmoji = '🏫';
+let selectedPresetIcon = 'school';
 
-const PRESET_EMOJIS = ['🏫', '🏠', '🏢', '💼', '🎓', '⚽', '🏥', '🛒', '🎭', '🏋️', '🚌', '📚'];
+const PRESET_ICONS = ['school', 'home', 'work', 'star', 'heart', 'bus', 'shopping', 'hospital', 'sport'];
 
 /**
  * Renderiza o esqueleto HTML da página de gerenciamento com as 4 abas e o backup.
@@ -131,9 +132,11 @@ export async function renderManagePage(): Promise<string> {
           <input type="text" id="preset-name" class="input" placeholder="Ex: Ir para a Escola" required />
 
           <label class="label">Selecionar Ícone</label>
-          <div class="emoji-grid">
-            ${PRESET_EMOJIS.map(emoji => `
-              <div class="emoji-option ${emoji === selectedPresetEmoji ? 'selected' : ''}" data-emoji="${emoji}">${emoji}</div>
+          <div class="icon-grid">
+            ${PRESET_ICONS.map(iconName => `
+              <div class="icon-option ${iconName === selectedPresetIcon ? 'selected' : ''}" data-icon="${iconName}">
+                ${getIcon(iconName, 18)}
+              </div>
             `).join('')}
           </div>
 
@@ -157,6 +160,9 @@ export async function renderManagePage(): Promise<string> {
 
           <label class="label" for="preset-trip-duration">Duração Estimada da Viagem (Minutos)</label>
           <input type="number" id="preset-trip-duration" class="input" min="0" value="25" placeholder="Tempo de viagem no ônibus" required />
+
+          <label class="label" for="preset-buffer-time">Margem de Segurança (Minutos de Antecedência)</label>
+          <input type="number" id="preset-buffer-time" class="input" min="0" value="2" placeholder="Ex: 2 min antes da previsão da IA" required />
 
           <div style="display: flex; gap: 8px;">
             <button type="submit" class="btn btn-primary" style="flex: 1;" id="btn-save-preset">Salvar Trajeto</button>
@@ -322,8 +328,8 @@ async function renderLinesList(): Promise<void> {
         </div>
       </div>
       <div class="list-item-actions">
-        <button class="list-item-btn edit-line-btn" data-id="${line.id}" title="Editar">✏️</button>
-        <button class="list-item-btn delete delete-line-btn" data-id="${line.id}" title="Excluir">🗑️</button>
+        <button class="list-item-btn edit-line-btn" data-id="${line.id}" title="Editar">${getIcon('edit', 14)}</button>
+        <button class="list-item-btn delete delete-line-btn" data-id="${line.id}" title="Excluir">${getIcon('trash', 14)}</button>
       </div>
     </div>
   `).join('');
@@ -462,8 +468,8 @@ async function renderStopsList(): Promise<void> {
         <span class="list-item-title">${stop.name}</span>
       </div>
       <div class="list-item-actions">
-        <button class="list-item-btn edit-stop-btn" data-id="${stop.id}" title="Editar">✏️</button>
-        <button class="list-item-btn delete delete-stop-btn" data-id="${stop.id}" title="Excluir">🗑️</button>
+        <button class="list-item-btn edit-stop-btn" data-id="${stop.id}" title="Editar">${getIcon('edit', 14)}</button>
+        <button class="list-item-btn delete delete-stop-btn" data-id="${stop.id}" title="Excluir">${getIcon('trash', 14)}</button>
       </div>
     </div>
   `).join('');
@@ -633,10 +639,12 @@ async function renderSchedulesList(lineId: string, dayType: any): Promise<void> 
   }
 
   container.innerHTML = sortedSchedules.map(sched => `
-    <div class="list-item" style="padding: 8px 12px;">
-      <span style="font-family: monospace; font-size: 15px; font-weight: 700;">⏱️ ${sched.departureTime}</span>
+    <div class="list-item" style="padding: 8px 12px; display: flex; align-items: center; justify-content: space-between;">
+      <span style="font-family: monospace; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+        ${getIcon('clock', 15)} ${sched.departureTime}
+      </span>
       <div class="list-item-actions">
-        <button class="list-item-btn delete delete-schedule-btn" data-id="${sched.id}" title="Excluir">🗑️</button>
+        <button class="list-item-btn delete delete-schedule-btn" data-id="${sched.id}" title="Excluir">${getIcon('trash', 14)}</button>
       </div>
     </div>
   `).join('');
@@ -662,6 +670,7 @@ async function setupPresetsTab(): Promise<void> {
   const destinationSelect = document.getElementById('preset-destination-select') as HTMLSelectElement;
   const offsetInput = document.getElementById('preset-boarding-offset') as HTMLInputElement;
   const durationInput = document.getElementById('preset-trip-duration') as HTMLInputElement;
+  const bufferInput = document.getElementById('preset-buffer-time') as HTMLInputElement;
   const cancelBtn = document.getElementById('btn-cancel-preset') as HTMLButtonElement;
   const submitBtn = document.getElementById('btn-save-preset') as HTMLButtonElement;
   const formTitle = document.getElementById('preset-form-title') as HTMLElement;
@@ -672,13 +681,13 @@ async function setupPresetsTab(): Promise<void> {
   await populatePresetsDropdowns();
   await renderPresetsList();
 
-  // Grid de emojis
-  const emojiOptions = form.querySelectorAll('.emoji-option');
-  emojiOptions.forEach(opt => {
+  // Grid de ícones vetoriais
+  const iconOptions = form.querySelectorAll('.icon-option');
+  iconOptions.forEach(opt => {
     opt.addEventListener('click', () => {
-      emojiOptions.forEach(o => o.classList.remove('selected'));
+      iconOptions.forEach(o => o.classList.remove('selected'));
       opt.classList.add('selected');
-      selectedPresetEmoji = opt.getAttribute('data-emoji')!;
+      selectedPresetIcon = opt.getAttribute('data-icon')!;
     });
   });
 
@@ -689,12 +698,12 @@ async function setupPresetsTab(): Promise<void> {
     submitBtn.textContent = 'Salvar Trajeto';
     cancelBtn.style.display = 'none';
     
-    // Reseta emoji para a escola
-    emojiOptions.forEach(o => o.classList.remove('selected'));
-    const defaultEmoji = emojiOptions[0];
-    if (defaultEmoji) {
-      defaultEmoji.classList.add('selected');
-      selectedPresetEmoji = '🏫';
+    // Reseta ícone para a escola (school)
+    iconOptions.forEach(o => o.classList.remove('selected'));
+    const defaultIcon = iconOptions[0];
+    if (defaultIcon) {
+      defaultIcon.classList.add('selected');
+      selectedPresetIcon = 'school';
     }
   });
 
@@ -706,6 +715,7 @@ async function setupPresetsTab(): Promise<void> {
     const destinationStopId = destinationSelect.value;
     const estimatedBoardingOffset = parseInt(offsetInput.value, 10);
     const estimatedTripDuration = parseInt(durationInput.value, 10);
+    const bufferTime = parseInt(bufferInput.value, 10) || 0;
 
     if (!name || !lineId || !boardingStopId || !destinationStopId) {
       showToast('Por favor, preencha todos os campos do trajeto.', 'error');
@@ -720,12 +730,13 @@ async function setupPresetsTab(): Promise<void> {
     const presetData: Preset = {
       id: editingPresetId || generateId(),
       name,
-      icon: selectedPresetEmoji,
+      icon: selectedPresetIcon,
       lineId,
       boardingStopId,
       destinationStopId,
       estimatedBoardingOffset,
-      estimatedTripDuration
+      estimatedTripDuration,
+      bufferTime
     };
 
     await put('presets', presetData);
@@ -741,12 +752,12 @@ async function setupPresetsTab(): Promise<void> {
     submitBtn.textContent = 'Salvar Trajeto';
     cancelBtn.style.display = 'none';
 
-    // Reseta emoji selecionado visualmente
-    emojiOptions.forEach(o => o.classList.remove('selected'));
-    const defaultEmoji = emojiOptions[0];
-    if (defaultEmoji) {
-      defaultEmoji.classList.add('selected');
-      selectedPresetEmoji = '🏫';
+    // Reseta ícone selecionado visualmente
+    iconOptions.forEach(o => o.classList.remove('selected'));
+    const defaultIcon = iconOptions[0];
+    if (defaultIcon) {
+      defaultIcon.classList.add('selected');
+      selectedPresetIcon = 'school';
     }
 
     await renderPresetsList();
@@ -825,22 +836,29 @@ async function renderPresetsList(): Promise<void> {
 
     const lineName = line ? `[${line.number}] ${line.name}` : 'Linha apagada';
     const routeText = boarding && destination 
-      ? `${boarding.name} ➡️ ${destination.name}` 
+      ? `${boarding.name} ${getIcon('arrowRight', 11)} ${destination.name}` 
       : 'Pontos não identificados';
+
+    const presetIconSvg = getIcon(preset.icon, 24, 'preset-list-icon');
+    const editIconSvg = getIcon('edit', 14);
+    const trashIconSvg = getIcon('trash', 14);
+    const bufferInfo = preset.bufferTime ? ` | Margem: ${preset.bufferTime} min` : '';
 
     return `
       <div class="list-item" style="align-items: flex-start; padding: 12px;">
         <div style="display: flex; gap: 10px;">
-          <span style="font-size: 24px; line-height: 1;">${preset.icon}</span>
+          <span style="color: var(--accent); display: flex; align-items: center; justify-content: center; height: 32px;">${presetIconSvg}</span>
           <div>
             <span class="list-item-title" style="display: block; font-weight: 700;">${preset.name}</span>
             <span class="list-item-meta" style="display: block;">Linha: ${lineName}</span>
-            <span class="list-item-meta" style="display: block; font-size: 12px; color: var(--text-secondary); margin-top: 4px;">${routeText}</span>
+            <span class="list-item-meta" style="display: block; font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+              ${routeText}${bufferInfo}
+            </span>
           </div>
         </div>
         <div class="list-item-actions">
-          <button class="list-item-btn edit-preset-btn" data-id="${preset.id}" title="Editar">✏️</button>
-          <button class="list-item-btn delete delete-preset-btn" data-id="${preset.id}" title="Excluir">🗑️</button>
+          <button class="list-item-btn edit-preset-btn" data-id="${preset.id}" title="Editar">${editIconSvg}</button>
+          <button class="list-item-btn delete delete-preset-btn" data-id="${preset.id}" title="Excluir">${trashIconSvg}</button>
         </div>
       </div>
     `;
@@ -859,13 +877,14 @@ async function renderPresetsList(): Promise<void> {
         (document.getElementById('preset-destination-select') as HTMLSelectElement).value = preset.destinationStopId;
         (document.getElementById('preset-boarding-offset') as HTMLInputElement).value = preset.estimatedBoardingOffset.toString();
         (document.getElementById('preset-trip-duration') as HTMLInputElement).value = preset.estimatedTripDuration.toString();
+        (document.getElementById('preset-buffer-time') as HTMLInputElement).value = (preset.bufferTime ?? 0).toString();
 
         // Altera ícone ativo na grid
-        const emojiOptions = document.querySelectorAll('#tab-presets .emoji-option');
-        emojiOptions.forEach(opt => {
-          if (opt.getAttribute('data-emoji') === preset.icon) {
+        const iconOptions = document.querySelectorAll('#tab-presets .icon-option');
+        iconOptions.forEach(opt => {
+          if (opt.getAttribute('data-icon') === preset.icon) {
             opt.classList.add('selected');
-            selectedPresetEmoji = preset.icon;
+            selectedPresetIcon = preset.icon;
           } else {
             opt.classList.remove('selected');
           }

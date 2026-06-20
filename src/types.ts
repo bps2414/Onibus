@@ -37,6 +37,7 @@ export interface Preset {
   destinationStopId: string // ponto onde desço
   estimatedBoardingOffset: number   // minutos estimados do terminal até meu ponto
   estimatedTripDuration: number     // minutos estimados do meu ponto até o destino
+  bufferTime?: number               // minutos de margem de segurança para chegar antes
 }
 
 // Registro de viagem (dados de aprendizado)
