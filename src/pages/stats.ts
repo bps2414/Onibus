@@ -1,20 +1,83 @@
 // ============================================================
-// stats.ts — Página de Estatísticas e Análise de Desempenho
+// stats.ts — Página de Estatísticas e Análise de Desempenho v2
 // ============================================================
 
 import { getAll, getSchedulesByLine, getSettings } from '../db/database';
 import { TripRecord, Preset, Schedule, BusLine } from '../types';
 import { calculateOverallStats, calculatePredictionAccuracy } from '../services/statistics';
-import { formatMinutes } from '../utils/time';
+import { formatMinutes, timeToMinutes, timeDiffMinutes } from '../utils/time';
 import { getIcon } from '../components/icons';
+import { getTimeBand } from '../services/prediction-utils';
 
 /**
  * Renderiza o esqueleto HTML da página de estatísticas com filtro de trajeto.
  * 
- * @returns String contendo o HTML básico
+ * @returns String contendo o HTML básico com estilo customizado para gráficos
  */
 export async function renderStatsPage(): Promise<string> {
   return `
+    <style>
+      .svg-chart {
+        overflow: visible;
+        width: 100%;
+        height: auto;
+      }
+      .grid-line {
+        stroke: var(--border);
+        opacity: 0.15;
+        stroke-width: 1;
+      }
+      .axis-line {
+        stroke: var(--border);
+        stroke-width: 1.5;
+      }
+      .chart-text {
+        font-size: 9px;
+        fill: var(--text-secondary);
+        font-family: inherit;
+      }
+      .bar {
+        transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1), y 0.4s cubic-bezier(0.4, 0, 0.2, 1), fill 0.2s ease;
+      }
+      .bar:hover {
+        fill: var(--accent) !important;
+        cursor: pointer;
+      }
+      .bar-val-text {
+        font-size: 8px;
+        fill: var(--text);
+        text-anchor: middle;
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+      .bar-group:hover .bar-val-text {
+        opacity: 1;
+      }
+      .scatter-dot {
+        transition: r 0.2s ease, opacity 0.2s ease;
+      }
+      .scatter-dot:hover {
+        r: 6.5;
+        opacity: 1 !important;
+        cursor: pointer;
+      }
+      .line-point {
+        transition: r 0.2s ease;
+      }
+      .line-point:hover {
+        r: 6;
+        cursor: pointer;
+      }
+      .donut-segment {
+        transition: stroke-width 0.2s ease;
+      }
+      .donut-segment:hover {
+        stroke-width: 14;
+        cursor: pointer;
+      }
+    </style>
+
     <div class="app-header">
       <div class="app-title">Estatísticas</div>
     </div>
@@ -139,13 +202,11 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
   let trendLabel = 'Estável';
   switch (stats.recentTrend) {
     case 'improving':
-      // Seta apontando para baixo (atrasos diminuindo)
-      trendIconSvg = getIcon('arrowRight', 28, 'text-success');
+      trendIconSvg = getIcon('arrowRight', 28);
       trendLabel = 'Melhorando (Atrasos menores)';
       break;
     case 'worsening':
-      // Seta apontando para cima (atrasos aumentando)
-      trendIconSvg = getIcon('arrowRight', 28, 'text-danger');
+      trendIconSvg = getIcon('arrowRight', 28);
       trendLabel = 'Piorando (Atrasos maiores)';
       break;
     case 'stable':
@@ -181,108 +242,301 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
     ? formatMinutes(Math.round(stats.avgTripDuration))
     : 'N/A';
 
-  // Ordena os dias da semana de segunda a domingo para exibição no gráfico
+  // ============================================================
+  // GRÁFICO 1: ATRASO MÉDIO POR DIA DA SEMANA (Barras SVG Animadas)
+  // ============================================================
   const orderedDays = [...stats.delayByDay].sort((a, b) => {
     const orderA = a.dayOfWeek === 0 ? 7 : a.dayOfWeek;
     const orderB = b.dayOfWeek === 0 ? 7 : b.dayOfWeek;
     return orderA - orderB;
   });
 
-  // Determina o maior atraso médio para definir a proporção das barras do gráfico (mínimo de 1)
   const maxDelay = Math.max(...orderedDays.map(d => Math.abs(d.avgDelay)), 1);
 
-  // ─── RENDERIZAÇÃO DO GRÁFICO SVG DINÂMICO ──────────────────────────────────
-  const svgWidth = 400;
-  const svgHeight = 220;
-  const paddingLeft = 32;
-  const paddingRight = 12;
-  const paddingTop = 24;
-  const paddingBottom = 32;
-  const chartWidth = svgWidth - paddingLeft - paddingRight;
-  const chartHeight = svgHeight - paddingTop - paddingBottom;
+  const barChartWidth = 400;
+  const barChartHeight = 180;
+  const paddingL = 32;
+  const paddingR = 12;
+  const paddingT = 24;
+  const paddingB = 28;
+  const graphW = barChartWidth - paddingL - paddingR;
+  const graphH = barChartHeight - paddingT - paddingB;
 
-  // Linhas de grade horizontais e rótulos do eixo Y
-  const gridTicks = [0, maxDelay * 0.33, maxDelay * 0.66, maxDelay];
-  const gridLinesHtml = gridTicks.map(tick => {
-    const y = svgHeight - paddingBottom - (tick / maxDelay) * chartHeight;
+  // Linhas de grade do eixo Y
+  const gridTicks = [0, maxDelay * 0.5, maxDelay];
+  const barGridHtml = gridTicks.map(tick => {
+    const y = barChartHeight - paddingB - (tick / maxDelay) * graphH;
     return `
-      <line x1="${paddingLeft}" y1="${y}" x2="${svgWidth - paddingRight}" y2="${y}" class="grid-line" />
-      <text x="${paddingLeft - 8}" y="${y + 3}" text-anchor="end" class="chart-text">${Math.round(tick)}m</text>
+      <line x1="${paddingL}" y1="${y}" x2="${barChartWidth - paddingR}" y2="${y}" class="grid-line" />
+      <text x="${paddingL - 6}" y="${y + 3}" text-anchor="end" class="chart-text">${Math.round(tick)}m</text>
     `;
   }).join('');
 
-  // Desenha as barras e rótulos do eixo X
-  const barSpacing = chartWidth / 7;
-  const barWidth = 24;
+  const barSpacing = graphW / 7;
+  const barWidth = 22;
 
-  const svgElementsHtml = orderedDays.map((day, index) => {
+  const barElementsHtml = orderedDays.map((day, index) => {
     const delayVal = day.avgDelay;
     const isHasData = day.recordCount > 0;
-    
-    // Altura proporcional
-    const height = isHasData ? (Math.abs(delayVal) / maxDelay) * chartHeight : 4; 
-    const x = paddingLeft + index * barSpacing + (barSpacing - barWidth) / 2;
-    const y = svgHeight - paddingBottom - height;
+    const height = isHasData ? (Math.abs(delayVal) / maxDelay) * graphH : 3; 
+    const x = paddingL + index * barSpacing + (barSpacing - barWidth) / 2;
+    const y = barChartHeight - paddingB - height;
 
-    let barColor = 'var(--border)'; // Sem dados (cinza)
+    let barColor = 'var(--border)';
     if (isHasData) {
-      if (delayVal > 10) barColor = 'var(--danger)'; // Vermelho para atrasos pesados
-      else if (delayVal > 5) barColor = 'var(--warning)'; // Amarelo para atrasos leves
-      else barColor = 'var(--success)'; // Verde para pontual
+      if (delayVal > 8) barColor = 'var(--danger)';
+      else if (delayVal > 4) barColor = 'var(--warning)';
+      else barColor = 'var(--success)';
     }
 
     const shortDayName = day.dayName.substring(0, 3);
-    const tooltipText = isHasData ? `${delayVal > 0 ? '+' : ''}${delayVal.toFixed(1)}m (${day.recordCount} v.)` : 'Sem dados';
+    const tooltip = isHasData ? `${day.dayName}: +${delayVal.toFixed(1)}m (${day.recordCount} viagens)` : `${day.dayName}: Sem registros`;
 
     return `
       <g class="bar-group">
-        <title>${day.dayName}: ${tooltipText}</title>
-        <!-- Barra retangular em SVG -->
-        <rect 
-          x="${x}" 
-          y="${y}" 
-          width="${barWidth}" 
-          height="${height}" 
-          fill="${barColor}" 
-          rx="4" 
-          ry="4" 
-          class="bar"
-        />
-        <!-- Texto de valor no topo da barra (exibido em hover no css) -->
-        <text 
-          x="${x + barWidth / 2}" 
-          y="${y - 6}" 
-          class="bar-val-text"
-        >
-          ${isHasData ? `${delayVal > 0 ? '+' : ''}${delayVal.toFixed(0)}m` : ''}
-        </text>
-        <!-- Rótulo do Dia no Eixo X -->
-        <text 
-          x="${x + barWidth / 2}" 
-          y="${svgHeight - 12}" 
-          class="bar-label chart-text"
-        >
-          ${shortDayName}
-        </text>
+        <title>${tooltip}</title>
+        <rect x="${x}" y="${y}" width="${barWidth}" height="${height}" fill="${barColor}" rx="4" class="bar" />
+        <text x="${x + barWidth / 2}" y="${y - 6}" class="bar-val-text">${isHasData ? `+${delayVal.toFixed(0)}m` : ''}</text>
+        <text x="${x + barWidth / 2}" y="${barChartHeight - 10}" class="chart-text" text-anchor="middle">${shortDayName}</text>
       </g>
     `;
   }).join('');
 
-  const svgChartHtml = `
-    <svg viewBox="0 0 ${svgWidth} ${svgHeight}" class="svg-chart">
-      <!-- Linhas de grade horizontais -->
-      ${gridLinesHtml}
+  // ============================================================
+  // GRÁFICO 2: LINHA TEMPORAL DE TENDÊNCIA (Últimas 30 Viagens)
+  // ============================================================
+  const sortedRecords = [...filteredRecords]
+    .sort((a, b) => a.date.localeCompare(b.date) || a.scheduledDeparture.localeCompare(b.scheduledDeparture))
+    .slice(-30);
+
+  let timelineHtml = '';
+  if (sortedRecords.length >= 3) {
+    const timeChartWidth = 400;
+    const timeChartHeight = 160;
+    const tlPaddingL = 32;
+    const tlPaddingR = 12;
+    const tlPaddingT = 20;
+    const tlPaddingB = 24;
+    const tlW = timeChartWidth - tlPaddingL - tlPaddingR;
+    const tlH = timeChartHeight - tlPaddingT - tlPaddingB;
+
+    const tripDelays = sortedRecords.map(r => timeDiffMinutes(r.scheduledDeparture, r.busArrivedAt));
+    const maxTlDelay = Math.max(...tripDelays.map(Math.abs), 5);
+
+    const getTlY = (d: number) => tlPaddingT + ((maxTlDelay - d) * tlH) / maxTlDelay;
+    const getTlX = (idx: number) => tlPaddingL + (idx * tlW) / (sortedRecords.length - 1);
+
+    const tlGridTicks = [0, maxTlDelay * 0.5, maxTlDelay];
+    const tlGridHtml = tlGridTicks.map(tick => {
+      const y = getTlY(tick);
+      return `
+        <line x1="${tlPaddingL}" y1="${y}" x2="${timeChartWidth - tlPaddingR}" y2="${y}" class="grid-line" />
+        <text x="${tlPaddingL - 6}" y="${y + 3}" text-anchor="end" class="chart-text">${Math.round(tick)}m</text>
+      `;
+    }).join('');
+
+    let pathD = '';
+    const pointsHtml = sortedRecords.map((r, idx) => {
+      const delay = timeDiffMinutes(r.scheduledDeparture, r.busArrivedAt);
+      const x = getTlX(idx);
+      const y = getTlY(delay);
+
+      if (idx === 0) pathD = `M ${x} ${y}`;
+      else pathD += ` L ${x} ${y}`;
+
+      const formattedDate = formatDate(r.date);
+      const tooltip = `Viagem ${idx + 1} (${formattedDate} ${r.scheduledDeparture}): ${delay > 0 ? '+' : ''}${delay} min`;
+
+      return `
+        <circle cx="${x}" cy="${y}" r="3.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="1.5" class="line-point">
+          <title>${tooltip}</title>
+        </circle>
+      `;
+    }).join('');
+
+    timelineHtml = `
+      <div class="card" style="margin-bottom: 16px;">
+        <h3 style="margin-bottom: 2px; font-size: 15px; font-weight: 600;">Evolução dos Atrasos</h3>
+        <p style="font-size: 11px; margin-bottom: 12px; color: var(--text-secondary);">Histórico cronológico das últimas ${sortedRecords.length} viagens registradas.</p>
+        <div class="chart-container">
+          <svg viewBox="0 0 ${timeChartWidth} ${timeChartHeight}" class="svg-chart">
+            ${tlGridHtml}
+            <line x1="${tlPaddingL}" y1="${timeChartHeight - tlPaddingB}" x2="${timeChartWidth - tlPaddingR}" y2="${timeChartHeight - tlPaddingB}" class="axis-line" />
+            <path d="${pathD}" fill="none" stroke="var(--accent)" stroke-width="2" opacity="0.6" />
+            ${pointsHtml}
+            <text x="${tlPaddingL}" y="${timeChartHeight - 4}" class="chart-text" text-anchor="start">Antigo</text>
+            <text x="${timeChartWidth - tlPaddingR}" y="${timeChartHeight - 4}" class="chart-text" text-anchor="end">Recente</text>
+          </svg>
+        </div>
+      </div>
+    `;
+  }
+
+  // ============================================================
+  // GRÁFICO 3: DISTRIBUIÇÃO POR FAIXA HORÁRIA (Donut SVG)
+  // ============================================================
+  const bandCounts = { dawn: 0, morning_rush: 0, midday: 0, evening_rush: 0, night: 0 };
+  filteredRecords.forEach(r => {
+    const band = getTimeBand(r.scheduledDeparture);
+    if (band in bandCounts) {
+      bandCounts[band as keyof typeof bandCounts]++;
+    }
+  });
+
+  const totalBandRecords = Object.values(bandCounts).reduce((a, b) => a + b, 0);
+
+  const bandMetadata = [
+    { key: 'dawn', label: 'Madrugada', color: '#a78bfa' },
+    { key: 'morning_rush', label: 'Rush Manhã', color: '#f87171' },
+    { key: 'midday', label: 'Entrepico', color: '#fbbf24' },
+    { key: 'evening_rush', label: 'Rush Tarde', color: '#f472b6' },
+    { key: 'night', label: 'Noite', color: '#60a5fa' }
+  ];
+
+  let donutSegmentsHtml = '';
+  let accumulatedOffset = 0;
+  const radius = 45;
+  const circumference = 2 * Math.PI * radius; // 282.74
+
+  bandMetadata.forEach(meta => {
+    const count = bandCounts[meta.key as keyof typeof bandCounts];
+    if (count > 0 && totalBandRecords > 0) {
+      const percentage = count / totalBandRecords;
+      const segmentLength = percentage * circumference;
+      donutSegmentsHtml += `
+        <circle 
+          cx="65" 
+          cy="65" 
+          r="${radius}" 
+          stroke="${meta.color}" 
+          stroke-width="10" 
+          fill="transparent" 
+          stroke-dasharray="${segmentLength} ${circumference}" 
+          stroke-dashoffset="${accumulatedOffset}" 
+          transform="rotate(-90, 65, 65)"
+          class="donut-segment"
+        >
+          <title>${meta.label}: ${count} viagens (${(percentage * 100).toFixed(0)}%)</title>
+        </circle>
+      `;
+      accumulatedOffset -= segmentLength;
+    }
+  });
+
+  let donutLegendHtml = bandMetadata.map(meta => {
+    const count = bandCounts[meta.key as keyof typeof bandCounts];
+    const pct = totalBandRecords > 0 ? (count / totalBandRecords) * 100 : 0;
+    return `
+      <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="width: 10px; height: 10px; border-radius: 50%; background-color: ${meta.color}; display: inline-block;"></span>
+          <span style="color: var(--text-secondary);">${meta.label}</span>
+        </div>
+        <span style="font-weight: 600;">${count} <span style="font-size: 10px; font-weight: normal; color: var(--text-secondary);">(${pct.toFixed(0)}%)</span></span>
+      </div>
+    `;
+  }).join('');
+
+  const donutChartHtml = `
+    <div class="card" style="margin-bottom: 16px;">
+      <h3 style="margin-bottom: 2px; font-size: 15px; font-weight: 600;">Viagens por Faixa Horária</h3>
+      <p style="font-size: 11px; margin-bottom: 16px; color: var(--text-secondary);">Frequência de registros de viagens por período do dia.</p>
       
-      <!-- Linha do Eixo X -->
-      <line x1="${paddingLeft}" y1="${svgHeight - paddingBottom}" x2="${svgWidth - paddingRight}" y2="${svgHeight - paddingBottom}" class="axis-line" />
-      
-      <!-- Elementos das barras e rótulos X -->
-      ${svgElementsHtml}
-    </svg>
+      <div style="display: flex; align-items: center; gap: 24px; justify-content: center; flex-wrap: wrap;">
+        <div style="width: 130px; height: 130px; position: relative;">
+          <svg viewBox="0 0 130 130" style="width: 100%; height: auto;">
+            <!-- Fundo cinza suave -->
+            <circle cx="65" cy="65" r="${radius}" stroke="var(--border)" stroke-width="10" fill="transparent" opacity="0.1" />
+            <!-- Segmentos coloridos -->
+            ${donutSegmentsHtml}
+          </svg>
+          <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;">
+            <span style="font-size: 18px; font-weight: 700;">${totalBandRecords}</span>
+            <span class="label" style="font-size: 8px; margin: 0;">Total</span>
+          </div>
+        </div>
+        
+        <div style="flex: 1; min-width: 140px;">
+          ${donutLegendHtml}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // ============================================================
+  // GRÁFICO 4: HORA DO DIA VS ATRASO (Scatter Plot - Dispersão)
+  // ============================================================
+  const scatterWidth = 400;
+  const scatterHeight = 160;
+  const scPaddingL = 32;
+  const scPaddingR = 16;
+  const scPaddingT = 20;
+  const scPaddingB = 24;
+  const scW = scatterWidth - scPaddingL - scPaddingR;
+  const scH = scatterHeight - scPaddingT - scPaddingB;
+
+  const maxScatterDelay = Math.max(...filteredRecords.map(r => timeDiffMinutes(r.scheduledDeparture, r.busArrivedAt)).map(Math.abs), 10);
+  
+  const getScY = (d: number) => scPaddingT + ((maxScatterDelay - d) * scH) / maxScatterDelay;
+  const getScX = (timeStr: string) => {
+    const mins = timeToMinutes(timeStr);
+    return scPaddingL + (mins / 1440) * scW; // 1440 min = 24h
+  };
+
+  const scGridTicksY = [0, maxScatterDelay * 0.5, maxScatterDelay];
+  const scGridHtmlY = scGridTicksY.map(tick => {
+    const y = getScY(tick);
+    return `
+      <line x1="${scPaddingL}" y1="${y}" x2="${scatterWidth - scPaddingR}" y2="${y}" class="grid-line" />
+      <text x="${scPaddingL - 6}" y="${y + 3}" text-anchor="end" class="chart-text">${Math.round(tick)}m</text>
+    `;
+  }).join('');
+
+  // Grades verticais a cada 4 horas (04:00, 08:00, 12:00, 16:00, 20:00, 24:00)
+  const hoursGrid = [240, 480, 720, 960, 1200, 1440];
+  const scGridHtmlX = hoursGrid.map(min => {
+    const x = scPaddingL + (min / 1440) * scW;
+    const hourLabel = `${String(min / 60).padStart(2, '0')}:00`;
+    return `
+      <line x1="${x}" y1="${scPaddingT}" x2="${x}" y2="${scatterHeight - scPaddingB}" stroke="var(--border)" opacity="0.08" stroke-width="0.8" />
+      <text x="${x}" y="${scatterHeight - 8}" text-anchor="middle" class="chart-text" style="font-size: 8px;">${hourLabel}</text>
+    `;
+  }).join('');
+
+  const scatterDotsHtml = filteredRecords.map(r => {
+    const delay = timeDiffMinutes(r.scheduledDeparture, r.busArrivedAt);
+    const x = getScX(r.scheduledDeparture);
+    const y = getScY(Math.max(0, delay)); // plota apenas atrasos positivos pra evitar quebra
+    
+    let color = 'var(--success)';
+    if (delay > 8) color = 'var(--danger)';
+    else if (delay > 4) color = 'var(--warning)';
+
+    const tooltip = `Dia ${formatDate(r.date)} (${r.scheduledDeparture}): +${delay} min`;
+    return `
+      <circle cx="${x}" cy="${y}" r="4" fill="${color}" opacity="0.7" class="scatter-dot">
+        <title>${tooltip}</title>
+      </circle>
+    `;
+  }).join('');
+
+  const scatterPlotHtml = `
+    <div class="card" style="margin-bottom: 16px;">
+      <h3 style="margin-bottom: 2px; font-size: 15px; font-weight: 600;">Atraso vs Horário da Viagem</h3>
+      <p style="font-size: 11px; margin-bottom: 12px; color: var(--text-secondary);">Dispersão das viagens ao longo do dia para identificar horários de engarrafamento.</p>
+      <div class="chart-container">
+        <svg viewBox="0 0 ${scatterWidth} ${scatterHeight}" class="svg-chart">
+          ${scGridHtmlY}
+          ${scGridHtmlX}
+          <line x1="${scPaddingL}" y1="${scatterHeight - scPaddingB}" x2="${scatterWidth - scPaddingR}" y2="${scatterHeight - scPaddingB}" class="axis-line" />
+          <line x1="${scPaddingL}" y1="${scPaddingT}" x2="${scPaddingL}" y2="${scatterHeight - scPaddingB}" class="axis-line" />
+          ${scatterDotsHtml}
+        </svg>
+      </div>
+    </div>
   `;
 
   // Rótulos de ícones para as estatísticas
-  const clockIconSvg = getIcon('clock', 18);
   const checkIconSvg = getIcon('check', 18);
   const alertIconSvg = getIcon('alert', 18);
 
@@ -323,15 +577,28 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
       <span ${trendRotationStyle} style="display: flex;">${trendIconSvg}</span>
     </div>
 
-    <!-- Gráfico de Atrasos Semanais -->
+    <!-- Gráfico 1: Atrasos Semanais -->
     <div class="card" style="margin-bottom: 16px;">
-      <h3 style="margin-bottom: 2px;">Atraso Médio por Dia</h3>
-      <p style="font-size: 11px; margin-bottom: 8px;">Valores de atraso em minutos comparados com o horário da tabela.</p>
+      <h3 style="margin-bottom: 2px; font-size: 15px; font-weight: 600;">Atraso Médio por Dia</h3>
+      <p style="font-size: 11px; margin-bottom: 8px; color: var(--text-secondary);">Valores de atraso em minutos comparados com o horário da tabela.</p>
       
       <div class="chart-container" style="position: relative;">
-        ${svgChartHtml}
+        <svg viewBox="0 0 ${barChartWidth} ${barChartHeight}" class="svg-chart">
+          ${barGridHtml}
+          <line x1="${paddingL}" y1="${barChartHeight - paddingB}" x2="${barChartWidth - paddingR}" y2="${barChartHeight - paddingB}" class="axis-line" />
+          ${barElementsHtml}
+        </svg>
       </div>
     </div>
+
+    <!-- Gráfico 2: Linha Temporal (Tendência Histórica) -->
+    ${timelineHtml}
+
+    <!-- Gráfico 3: Donut Faixas Horárias -->
+    ${donutChartHtml}
+
+    <!-- Gráfico 4: Scatter Plot (Dispersão Dia/Atraso) -->
+    ${scatterPlotHtml}
 
     <!-- Informações Extras (Mais Pontual vs Mais Atrasado) -->
     <div class="card" style="background-color: var(--surface); padding: 12px 16px;">
@@ -349,4 +616,15 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
       </div>
     </div>
   `;
+}
+
+/**
+ * Helper interno para formatar datas YYYY-MM-DD para DD/MM
+ */
+function formatDate(dateStr: string): string {
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}`;
+  }
+  return dateStr;
 }
