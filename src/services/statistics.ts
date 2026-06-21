@@ -1,11 +1,12 @@
 /**
- * statistics.ts — Cálculos de Estatísticas
+ * statistics.ts — Cálculos de Estatísticas v2
  *
  * Analisa os registros de viagem pra gerar estatísticas úteis:
  * - Atraso médio geral e por dia da semana
  * - Duração média de viagem
- * - Tendência recente (melhorando/piorando)
- * - Precisão das previsões (backtesting)
+ * - Tendência recente (regressão linear, não mais comparação simples)
+ * - Precisão das previsões (backtesting com resultados detalhados)
+ * - Score de confiabilidade da linha
  */
 
 import type {
@@ -14,6 +15,7 @@ import type {
   Preset,
   DayStats,
   OverallStats,
+  BacktestResult,
 } from '../types'
 
 import {
@@ -23,6 +25,7 @@ import {
 } from '../utils/time'
 
 import { predictArrival } from './prediction'
+import { linearRegression, calculateLineReliability } from './prediction-utils'
 
 // ─── Funções Auxiliares ─────────────────────────────────────────────────────
 
@@ -107,35 +110,37 @@ export function calculateDayStats(records: TripRecord[]): DayStats[] {
 }
 
 /**
- * Calcula a tendência recente comparando os últimos 7 dias com os 7 anteriores.
- * - Se diferença > 2min de atraso: worsening
- * - Se diferença < -2min: improving
- * - Se < 5 registros em algum período: insufficient_data
- * - Senão: stable
+ * Calcula a tendência recente usando regressão linear nos últimos 14 dias.
+ * Mais preciso que a comparação simples de 2 semanas da v1.
+ * Usa o slope da regressão pra determinar direção.
  */
 export function calculateTrend(
   records: TripRecord[]
 ): 'improving' | 'worsening' | 'stable' | 'insufficient_data' {
-  // Últimos 7 dias
-  const recent = records.filter((r) => daysSince(r.date) <= 7)
-  // 8 a 14 dias atrás
-  const previous = records.filter((r) => {
-    const days = daysSince(r.date)
-    return days > 7 && days <= 14
-  })
+  // Filtra registros dos últimos 14 dias
+  const recent = records.filter((r) => daysSince(r.date) <= 14)
 
-  // Precisa de pelo menos 5 registros em cada período
-  if (recent.length < 5 || previous.length < 5) {
+  // Precisa de pelo menos 5 registros pra tendência confiável
+  if (recent.length < 5) {
     return 'insufficient_data'
   }
 
-  const recentAvg = average(recent.map(recordDelay))
-  const previousAvg = average(previous.map(recordDelay))
-  const diff = recentAvg - previousAvg
+  // Monta pontos pra regressão (x = dias desde o registro, invertido)
+  const points = recent.map(r => ({
+    x: 14 - daysSince(r.date), // x crescente com o tempo
+    y: recordDelay(r),
+  }))
 
-  // Positivo = piorou (mais atraso), negativo = melhorou
-  if (diff > 2) return 'worsening'
-  if (diff < -2) return 'improving'
+  const regression = linearRegression(points)
+
+  // Se R² muito baixo, dados muito ruidosos
+  if (regression.rSquared < 0.15) {
+    return 'stable'
+  }
+
+  // Slope positivo = atrasos aumentando = piorando
+  if (regression.slope > 0.2) return 'worsening'
+  if (regression.slope < -0.2) return 'improving'
   return 'stable'
 }
 
@@ -151,16 +156,29 @@ export function calculatePredictionAccuracy(
   preset: Preset,
   schedules: Schedule[]
 ): number | null {
-  // Precisa de pelo menos 5 registros pra calcular precisão
-  if (records.length < 5) return null
+  const results = calculateBacktestResults(records, preset, schedules)
+  if (results.length === 0) return null
+  const hits = results.filter(r => r.wasAccurate).length
+  return Math.round((hits / results.length) * 100)
+}
+
+/**
+ * Calcula resultados detalhados de backtesting pra visualização na aba IA.
+ * Retorna array de { date, predicted, actual, error, wasAccurate } pra cada viagem.
+ */
+export function calculateBacktestResults(
+  records: TripRecord[],
+  preset: Preset,
+  schedules: Schedule[]
+): BacktestResult[] {
+  // Precisa de pelo menos 5 registros pra backtesting
+  if (records.length < 5) return []
 
   // Ordena por data pra garantir ordem cronológica
   const sorted = [...records].sort((a, b) => a.date.localeCompare(b.date))
+  const results: BacktestResult[] = []
 
-  let hits = 0
-  let totalEvaluated = 0
-
-  // Pra cada registro (exceto os primeiros que não têm histórico)
+  // Pra cada registro (exceto os primeiros que não têm histórico suficiente)
   for (let i = 2; i < sorted.length; i++) {
     const current = sorted[i]
 
@@ -179,25 +197,39 @@ export function calculatePredictionAccuracy(
     const prediction = predictArrival(matchingSchedule, preset, previousRecords)
 
     // Compara previsão com realidade
-    const predictedMinutes = timeDiffMinutes(
+    const predictedOffset = timeDiffMinutes(
       matchingSchedule.departureTime,
       prediction.predictedBusArrival
     )
-    const actualMinutes = timeDiffMinutes(
+    const actualOffset = timeDiffMinutes(
       current.scheduledDeparture,
       current.busArrivedAt
     )
 
-    const error = Math.abs(predictedMinutes - actualMinutes)
+    const error = Math.abs(predictedOffset - actualOffset)
 
-    // Acertou se erro ≤ 3 minutos
-    if (error <= 3) hits++
-    totalEvaluated++
+    results.push({
+      date: current.date,
+      scheduledDeparture: current.scheduledDeparture,
+      predictedOffset,
+      actualOffset,
+      error,
+      wasAccurate: error <= 3,
+    })
   }
 
-  if (totalEvaluated === 0) return null
+  return results
+}
 
-  return Math.round((hits / totalEvaluated) * 100)
+/**
+ * Calcula o score de confiabilidade de uma linha baseado nos registros.
+ * Wrapper que extrai os offsets e chama calculateLineReliability do prediction-utils.
+ */
+export function getLineReliabilityScore(records: TripRecord[]): number {
+  const offsets = records
+    .filter(r => !r.isOutlier)
+    .map(recordDelay)
+  return calculateLineReliability(offsets)
 }
 
 /**
@@ -249,7 +281,7 @@ export function calculateOverallStats(
     mostDelayedDay = sorted[sorted.length - 1].dayName
   }
 
-  // Tendência recente
+  // Tendência recente (agora usa regressão linear)
   const recentTrend = calculateTrend(records)
 
   return {
