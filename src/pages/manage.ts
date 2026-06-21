@@ -164,6 +164,11 @@ export async function renderManagePage(): Promise<string> {
           <label class="label" for="preset-buffer-time">Margem de Segurança (Minutos de Antecedência)</label>
           <input type="number" id="preset-buffer-time" class="input" min="0" value="2" placeholder="Ex: 2 min antes da previsão da IA" required />
 
+          <label class="label" for="preset-schedule-select">Horário de Costume (Opcional)</label>
+          <select class="select" id="preset-schedule-select">
+            <option value="none">Selecione uma linha primeiro...</option>
+          </select>
+
           <div style="display: flex; gap: 8px;">
             <button type="submit" class="btn btn-primary" style="flex: 1;" id="btn-save-preset">Salvar Trajeto</button>
             <button type="button" class="btn btn-secondary" id="btn-cancel-preset" style="display: none;">Cancelar</button>
@@ -700,6 +705,11 @@ async function setupPresetsTab(): Promise<void> {
   await populatePresetsDropdowns();
   await renderPresetsList();
 
+  // Escuta a mudança de linha para carregar os horários daquela linha
+  lineSelect.addEventListener('change', async () => {
+    await populatePresetScheduleDropdown(lineSelect.value);
+  });
+
   // Grid de ícones vetoriais
   const iconOptions = form.querySelectorAll('.icon-option');
   iconOptions.forEach(opt => {
@@ -710,13 +720,16 @@ async function setupPresetsTab(): Promise<void> {
     });
   });
 
-  cancelBtn.addEventListener('click', () => {
+  cancelBtn.addEventListener('click', async () => {
     editingPresetId = null;
     form.reset();
     formTitle.textContent = 'Adicionar Novo Trajeto';
     submitBtn.textContent = 'Salvar Trajeto';
     cancelBtn.style.display = 'none';
     
+    // Limpa o select de horários
+    await populatePresetScheduleDropdown('');
+
     // Reseta ícone para a escola (school)
     iconOptions.forEach(o => o.classList.remove('selected'));
     const defaultIcon = iconOptions[0];
@@ -735,6 +748,9 @@ async function setupPresetsTab(): Promise<void> {
     const estimatedBoardingOffset = parseInt(offsetInput.value, 10);
     const estimatedTripDuration = parseInt(durationInput.value, 10);
     const bufferTime = parseInt(bufferInput.value, 10) || 0;
+
+    const scheduleSelect = document.getElementById('preset-schedule-select') as HTMLSelectElement;
+    const preferredScheduleId = scheduleSelect && scheduleSelect.value !== 'none' ? scheduleSelect.value : undefined;
 
     if (!name || !lineId || !boardingStopId || !destinationStopId) {
       showToast('Por favor, preencha todos os campos do trajeto.', 'error');
@@ -755,7 +771,8 @@ async function setupPresetsTab(): Promise<void> {
       destinationStopId,
       estimatedBoardingOffset,
       estimatedTripDuration,
-      bufferTime
+      bufferTime,
+      preferredScheduleId
     };
 
     await put('presets', presetData);
@@ -771,6 +788,9 @@ async function setupPresetsTab(): Promise<void> {
     submitBtn.textContent = 'Salvar Trajeto';
     cancelBtn.style.display = 'none';
 
+    // Limpa o select de horários
+    await populatePresetScheduleDropdown('');
+
     // Reseta ícone selecionado visualmente
     iconOptions.forEach(o => o.classList.remove('selected'));
     const defaultIcon = iconOptions[0];
@@ -780,6 +800,39 @@ async function setupPresetsTab(): Promise<void> {
     }
 
     await renderPresetsList();
+  });
+}
+
+async function populatePresetScheduleDropdown(lineId: string, selectedScheduleId?: string): Promise<void> {
+  const scheduleSelect = document.getElementById('preset-schedule-select') as HTMLSelectElement;
+  if (!scheduleSelect) return;
+
+  if (!lineId || lineId === 'none') {
+    scheduleSelect.innerHTML = '<option value="none">Selecione uma linha primeiro...</option>';
+    scheduleSelect.disabled = true;
+    return;
+  }
+
+  const schedules = await getSchedulesByLine(lineId);
+  const sorted = schedules.sort((a, b) => a.departureTime.localeCompare(b.departureTime));
+
+  scheduleSelect.disabled = false;
+  scheduleSelect.innerHTML = '<option value="none">Nenhum (usar próximo horário dinâmico)</option>';
+
+  const dayTypeLabels: Record<string, string> = {
+    weekday: 'Útil',
+    saturday: 'Sáb',
+    sunday_holiday: 'Dom/Feriado'
+  };
+
+  sorted.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = `${s.departureTime} (${dayTypeLabels[s.dayType] || s.dayType})`;
+    if (selectedScheduleId && s.id === selectedScheduleId) {
+      opt.selected = true;
+    }
+    scheduleSelect.appendChild(opt);
   });
 }
 
@@ -804,7 +857,12 @@ async function populatePresetsDropdowns(): Promise<void> {
     opt.textContent = `[${l.number}] ${l.name}`;
     lineSelect.appendChild(opt);
   });
-  if (lines.some(l => l.id === prevLine)) lineSelect.value = prevLine;
+  if (lines.some(l => l.id === prevLine)) {
+    lineSelect.value = prevLine;
+  }
+
+  // Popula horários baseados na linha selecionada
+  await populatePresetScheduleDropdown(lineSelect.value);
 
   // Popula pontos embarque
   const prevBoarding = boardingSelect.value;
@@ -833,10 +891,11 @@ async function renderPresetsList(): Promise<void> {
   const container = document.getElementById('presets-list-container');
   if (!container) return;
 
-  const [presets, lines, stops] = await Promise.all([
+  const [presets, lines, stops, schedules] = await Promise.all([
     getAll<Preset>('presets'),
     getAll<BusLine>('busLines'),
-    getAll<BusStop>('busStops')
+    getAll<BusStop>('busStops'),
+    getAll<Schedule>('schedules')
   ]);
 
   if (presets.length === 0) {
@@ -861,7 +920,10 @@ async function renderPresetsList(): Promise<void> {
     const presetIconSvg = getIcon(preset.icon, 24, 'preset-list-icon');
     const editIconSvg = getIcon('edit', 14);
     const trashIconSvg = getIcon('trash', 14);
-    const bufferInfo = preset.bufferTime ? ` | Margem: ${preset.bufferTime} min` : '';
+
+    const preferredSchedule = schedules.find(s => s.id === preset.preferredScheduleId);
+    const scheduleInfo = preferredSchedule ? ` | Costume: ${preferredSchedule.departureTime}` : '';
+    const bufferInfo = (preset.bufferTime ? ` | Margem: ${preset.bufferTime} min` : '') + scheduleInfo;
 
     return `
       <div class="list-item" style="align-items: flex-start; padding: 12px;">
@@ -897,6 +959,9 @@ async function renderPresetsList(): Promise<void> {
         (document.getElementById('preset-boarding-offset') as HTMLInputElement).value = preset.estimatedBoardingOffset.toString();
         (document.getElementById('preset-trip-duration') as HTMLInputElement).value = preset.estimatedTripDuration.toString();
         (document.getElementById('preset-buffer-time') as HTMLInputElement).value = (preset.bufferTime ?? 0).toString();
+
+        // Carrega o dropdown de horários de costume com a linha do preset e seleciona o correto
+        await populatePresetScheduleDropdown(preset.lineId, preset.preferredScheduleId);
 
         // Altera ícone ativo na grid
         const iconOptions = document.querySelectorAll('#tab-presets .icon-option');

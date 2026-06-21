@@ -3,8 +3,8 @@
 // ============================================================
 
 import { getSettings, saveSettings, getAll, getById, put, getSchedulesByLine } from '../db/database';
-import { Preset, TripRecord, BusLine, BusStop, Schedule } from '../types';
-import { findNextBuses, minutesUntilArrival } from '../services/prediction';
+import { Preset, TripRecord, BusLine, BusStop, Schedule, Prediction } from '../types';
+import { findNextBuses, minutesUntilArrival, predictArrival } from '../services/prediction';
 import { currentTime, currentDate, formatMinutes, timeDiffMinutes, addMinutes } from '../utils/time';
 import { generateId, detectDayType } from '../utils/helpers';
 import { renderCountdown } from '../components/countdown';
@@ -396,10 +396,30 @@ async function updateTrackerView(presetId: string): Promise<void> {
   // Filtra registros históricos específicos deste preset para alimentar o algoritmo
   const presetRecords = records.filter(r => r.presetId === preset.id);
 
-  // Detecta o tipo de dia e calcula a previsão do próximo ônibus
+  // Detecta o tipo de dia e calcula a previsão do próximo ônibus (ou do horário de costume configurado)
   const currentDayType = detectDayType(new Date());
-  const predictions = findNextBuses(preset, schedules, presetRecords, currentDayType, 3);
-  const prediction = predictions[0];
+  let prediction: Prediction | null = null;
+  let predictions: Prediction[] = [];
+
+  if (preset.preferredScheduleId && preset.preferredScheduleId !== 'none') {
+    const preferredSchedule = schedules.find(s => s.id === preset.preferredScheduleId);
+    if (preferredSchedule && preferredSchedule.dayType === currentDayType) {
+      prediction = predictArrival(preferredSchedule, preset, presetRecords);
+      
+      // Busca próximos horários a partir do horário de costume
+      predictions = findNextBuses(preset, schedules, presetRecords, currentDayType, 3, preferredSchedule.departureTime);
+      
+      // Garante que o preferido é o primeiro da lista
+      if (predictions.length === 0 || predictions[0].scheduledDeparture !== preferredSchedule.departureTime) {
+        predictions.unshift(prediction);
+      }
+    }
+  }
+
+  if (!prediction) {
+    predictions = findNextBuses(preset, schedules, presetRecords, currentDayType, 3);
+    prediction = predictions[0] || null;
+  }
 
   if (!prediction) {
     container.innerHTML = `

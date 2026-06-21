@@ -38,6 +38,7 @@ export interface Preset {
   estimatedBoardingOffset: number   // minutos estimados do terminal até meu ponto
   estimatedTripDuration: number     // minutos estimados do meu ponto até o destino
   bufferTime?: number               // minutos de margem de segurança para chegar antes
+  preferredScheduleId?: string      // ID do horário de costume configurado
 }
 
 // Registro de viagem (dados de aprendizado)
