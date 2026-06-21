@@ -8,6 +8,7 @@ import { renderHomePage, initHomePage } from './pages/home';
 import { renderManagePage, initManagePage } from './pages/manage';
 import { renderHistoryPage, initHistoryPage } from './pages/history';
 import { renderStatsPage, initStatsPage } from './pages/stats';
+import { renderAiPage, initAiPage } from './pages/ai';
 import { initThemeToggle, applyThemeToDocument } from './components/theme-toggle';
 
 // Variável para reter o ID do intervalo do countdown ativo
@@ -43,7 +44,7 @@ async function navigate(hash: string) {
   let html = '';
   
   // Renderiza o HTML estático correspondente
-  switch (page) {
+    switch (page) {
     case 'home':
       html = await renderHomePage();
       break;
@@ -55,6 +56,9 @@ async function navigate(hash: string) {
       break;
     case 'stats':
       html = await renderStatsPage();
+      break;
+    case 'ai':
+      html = await renderAiPage();
       break;
     default:
       html = await renderHomePage();
@@ -77,6 +81,9 @@ async function navigate(hash: string) {
       break;
     case 'stats':
       await initStatsPage();
+      break;
+    case 'ai':
+      await initAiPage();
       break;
     default:
       await initHomePage();
