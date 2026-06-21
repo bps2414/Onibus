@@ -9,6 +9,7 @@ import { currentTime, currentDate, formatMinutes, timeDiffMinutes, addMinutes } 
 import { generateId, detectDayType } from '../utils/helpers';
 import { renderCountdown } from '../components/countdown';
 import { renderConfidence } from '../components/confidence';
+import { renderConfidenceInterval, renderTrendBadge, renderOutlierBadge } from '../components/confidence-interval';
 import { showToast } from '../components/toast';
 import { renderThemeToggle, initThemeToggle } from '../components/theme-toggle';
 import { setCountdownInterval } from '../main';
@@ -406,7 +407,9 @@ async function updateTrackerView(presetId: string): Promise<void> {
       <!-- Recomendação de Saída baseada na caminhada + margem de segurança -->
       ${leaveHtml}
 
-      <!-- Horários previstos -->
+      <!-- Horários previstos com intervalo de confiança -->
+      ${renderConfidenceInterval(prediction.predictedBusArrival, prediction.confidenceInterval)}
+
       <div class="card" style="background-color: var(--bg); margin: 0 0 14px 0; padding: 12px; border-radius: var(--radius);">
         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
           <span style="font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
@@ -414,13 +417,18 @@ async function updateTrackerView(presetId: string): Promise<void> {
           </span>
           <span style="font-size: 13px; font-weight: 700; color: var(--text);">~${prediction.predictedBusArrival}</span>
         </div>
-        <div style="display: flex; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
           <span style="font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
             ${getIcon('arrowRight', 13)} Previsão no Destino:
           </span>
           <span style="font-size: 13px; font-weight: 700; color: var(--success);">
             ${prediction.predictedDestinationArrival ? `~${prediction.predictedDestinationArrival}` : 'Sem histórico'}
           </span>
+        </div>
+        <!-- Badges de tendência e outliers -->
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+          ${renderTrendBadge(prediction.trendDirection, prediction.trendStrength)}
+          ${renderOutlierBadge(prediction.outlierCount)}
         </div>
       </div>
 
