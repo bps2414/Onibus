@@ -4,7 +4,7 @@
 
 import { getSettings, saveSettings, getAll, getById, put, getSchedulesByLine } from '../db/database';
 import { Preset, TripRecord, BusLine, BusStop, Schedule } from '../types';
-import { findNextBus, minutesUntilArrival } from '../services/prediction';
+import { findNextBuses, minutesUntilArrival } from '../services/prediction';
 import { currentTime, currentDate, formatMinutes, timeDiffMinutes, addMinutes } from '../utils/time';
 import { generateId, detectDayType } from '../utils/helpers';
 import { renderCountdown } from '../components/countdown';
@@ -267,7 +267,8 @@ async function updateTrackerView(presetId: string): Promise<void> {
 
   // Detecta o tipo de dia e calcula a previsão do próximo ônibus
   const currentDayType = detectDayType(new Date());
-  const prediction = findNextBus(preset, schedules, presetRecords, currentDayType);
+  const predictions = findNextBuses(preset, schedules, presetRecords, currentDayType, 3);
+  const prediction = predictions[0];
 
   if (!prediction) {
     container.innerHTML = `
@@ -365,6 +366,39 @@ async function updateTrackerView(presetId: string): Promise<void> {
     `;
   }
 
+  // Gera o HTML para os próximos ônibus da sequência
+  let nextBusesGridHtml = '';
+  if (predictions.length > 1) {
+    const extraPredictions = predictions.slice(1);
+    const cols = extraPredictions.map(pred => {
+      const minLeft = timeDiffMinutes(currentTime(), pred.predictedBusArrival);
+      const confColor = pred.confidence >= 75 ? 'var(--success)' : pred.confidence >= 40 ? 'var(--warning)' : 'var(--danger)';
+      return `
+        <div class="card" style="margin-bottom: 0; padding: 10px 12px; background-color: var(--surface); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px;">
+          <span class="label" style="font-size: 8px; margin-bottom: 0; letter-spacing: 0.03em; color: var(--text-secondary);">Na sequência</span>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 4px;">
+            <strong style="font-size: 14px; color: var(--text);">~${pred.predictedBusArrival}</strong>
+            <span style="font-size: 11px; color: var(--text-secondary); font-family: monospace;">Tabela: ${pred.scheduledDeparture}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 10px;">
+            <span style="color: var(--text-secondary); display: flex; align-items: center; gap: 2px;">
+              ${getIcon('clock', 10)} em ${minLeft} min
+            </span>
+            <span style="font-weight: 600; color: ${confColor};">
+              ${Math.round(pred.confidence)}% conf.
+            </span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    nextBusesGridHtml = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px;">
+        ${cols}
+      </div>
+    `;
+  }
+
   container.innerHTML = `
     <div class="card" style="margin-bottom: 16px; position: relative;">
       <!-- Cabeçalho do Preset -->
@@ -435,6 +469,9 @@ async function updateTrackerView(presetId: string): Promise<void> {
       <!-- Barra de Confiança -->
       ${confidenceHtml}
     </div>
+
+    <!-- Próximos ônibus na sequência -->
+    ${nextBusesGridHtml}
 
     <!-- Botões de Registro -->
     <div style="margin-top: 16px;">
