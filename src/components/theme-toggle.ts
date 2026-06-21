@@ -39,6 +39,10 @@ export async function initThemeToggle(): Promise<void> {
   const button = document.getElementById('theme-toggle-btn');
   if (!button) return;
 
+  // Evita anexar múltiplos event listeners se a função for chamada mais de uma vez no mesmo elemento
+  if ((button as any).__themeListenerAttached) return;
+  (button as any).__themeListenerAttached = true;
+
   // Recupera as configurações de IndexedDB
   const settings = await getSettings();
   const currentTheme = settings.theme || 'dark';

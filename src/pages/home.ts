@@ -12,7 +12,6 @@ import { renderConfidence } from '../components/confidence';
 import { renderConfidenceInterval, renderTrendBadge, renderOutlierBadge } from '../components/confidence-interval';
 import { showToast } from '../components/toast';
 import { renderThemeToggle, initThemeToggle } from '../components/theme-toggle';
-import { setCountdownInterval } from '../main';
 import { getIcon } from '../components/icons';
 
 // Guarda o ID do registro de viagem em andamento
@@ -60,9 +59,6 @@ export async function renderHomePage(): Promise<string> {
  * Popula o seletor de presets, escuta mudanças, registra as notificações e inicia o intervalo do timer.
  */
 export async function initHomePage(): Promise<void> {
-  // Inicializa o alternador de temas no cabeçalho
-  initThemeToggle();
-
   const presetSelector = document.getElementById('preset-selector') as HTMLSelectElement;
   const btnNotifyToggle = document.getElementById('btn-notify-toggle') as HTMLButtonElement;
   if (!presetSelector || !btnNotifyToggle) return;
@@ -152,6 +148,12 @@ export async function initHomePage(): Promise<void> {
   // Executa a primeira renderização do painel de rastreamento
   await updateTrackerView(activePresetId);
 
+  // Limpa qualquer temporizador anterior existente para evitar vazamento de memória e acúmulos
+  if ((window as any).busTrackerCountdownInterval) {
+    window.clearInterval((window as any).busTrackerCountdownInterval);
+    (window as any).busTrackerCountdownInterval = null;
+  }
+
   // Define um intervalo para atualizar o countdown a cada segundo
   const intervalId = window.setInterval(async () => {
     const currentSettings = await getSettings();
@@ -160,8 +162,8 @@ export async function initHomePage(): Promise<void> {
     }
   }, 1000);
 
-  // Compartilha o ID do timer com o router para limpeza na navegação
-  setCountdownInterval(intervalId);
+  // Compartilha o ID do timer globalmente
+  (window as any).busTrackerCountdownInterval = intervalId;
 }
 
 /**

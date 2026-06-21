@@ -11,17 +11,7 @@ import { renderStatsPage, initStatsPage } from './pages/stats';
 import { renderAiPage, initAiPage } from './pages/ai';
 import { initThemeToggle, applyThemeToDocument } from './components/theme-toggle';
 
-// Variável para reter o ID do intervalo do countdown ativo
-export let countdownInterval: number | null = null;
 
-/**
- * Atualiza o ID do intervalo ativo de rastreamento para permitir sua limpeza posterior.
- * 
- * @param intervalId - Novo ID de intervalo gerado ou null
- */
-export function setCountdownInterval(intervalId: number | null): void {
-  countdownInterval = intervalId;
-}
 
 /**
  * Executa a navegação de páginas baseado no hash URL.
@@ -30,9 +20,9 @@ export function setCountdownInterval(intervalId: number | null): void {
  */
 async function navigate(hash: string) {
   // Limpa o timer do countdown ativo ao sair da home
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-    countdownInterval = null;
+  if ((window as any).busTrackerCountdownInterval) {
+    clearInterval((window as any).busTrackerCountdownInterval);
+    (window as any).busTrackerCountdownInterval = null;
   }
 
   const app = document.getElementById('app');
