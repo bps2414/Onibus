@@ -182,7 +182,26 @@ export async function renderManagePage(): Promise<string> {
     <!-- Seção de Backup e Restauração de Dados -->
     <div class="card" style="margin-top: 24px; border-color: rgba(99, 102, 241, 0.3); background: linear-gradient(180deg, var(--surface) 0%, rgba(99, 102, 241, 0.02) 100%);">
       <h3>Segurança dos Dados</h3>
-      <p style="margin-bottom: 16px; font-size: 13px;">Faça backup de suas linhas, horários e histórico de viagens localmente.</p>
+      <p style="margin-bottom: 12px; font-size: 13px;">Faça backup de suas linhas, horários e histórico de viagens localmente.</p>
+      
+      <!-- Seletores de exportação melhorada -->
+      <div style="margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>
+          <label class="label" for="export-period" style="font-size: 9px; margin-bottom: 4px; display: block;">Período do Histórico</label>
+          <select class="select" id="export-period" style="margin-bottom: 0; padding: 6px 10px; font-size: 12px; height: 34px;">
+            <option value="all">Todo o histórico</option>
+            <option value="30">Últimos 30 dias</option>
+            <option value="7">Últimos 7 dias</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="export-format" style="font-size: 9px; margin-bottom: 4px; display: block;">Formato do Arquivo</label>
+          <select class="select" id="export-format" style="margin-bottom: 0; padding: 6px 10px; font-size: 12px; height: 34px;">
+            <option value="json">Backup Completo (JSON)</option>
+            <option value="report">Relatório Legível (TXT)</option>
+          </select>
+        </div>
+      </div>
       
       <div style="display: flex; gap: 12px;">
         <button class="btn btn-secondary" id="btn-export-backup" style="flex: 1; gap: 6px;">📥 Exportar Backup</button>
@@ -929,14 +948,18 @@ function setupBackupEvents(): void {
   const btnExport = document.getElementById('btn-export-backup') as HTMLButtonElement;
   const btnTriggerImport = document.getElementById('btn-trigger-import') as HTMLButtonElement;
   const fileInput = document.getElementById('import-file-input') as HTMLInputElement;
+  const selectPeriod = document.getElementById('export-period') as HTMLSelectElement;
+  const selectFormat = document.getElementById('export-format') as HTMLSelectElement;
 
   if (!btnExport || !btnTriggerImport || !fileInput) return;
 
   // Exportar dados
   btnExport.addEventListener('click', async () => {
     try {
-      await exportBackup();
-      showToast('Backup gerado e baixado!', 'success');
+      const period = selectPeriod ? selectPeriod.value : 'all';
+      const format = selectFormat ? selectFormat.value : 'json';
+      await exportBackup(period, format);
+      showToast(format === 'json' ? 'Backup gerado com sucesso!' : 'Relatório gerado com sucesso!', 'success');
     } catch (err) {
       showToast('Falha ao exportar os dados.', 'error');
     }
