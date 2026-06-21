@@ -1042,7 +1042,7 @@ function setupBackupEvents(): void {
 
     showModal(
       'Confirmar Restauração',
-      'Importar este arquivo substituirá TODO o seu banco de dados atual do BusTracker. Deseja continuar?',
+      'Importar este arquivo substituirá TODO o seu banco de dados atual do BoraBus. Deseja continuar?',
       async () => {
         try {
           const res = await importBackup(file);

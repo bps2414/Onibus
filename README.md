@@ -1,6 +1,6 @@
-# 🚌 BusTracker
+# 🚌 BoraBus
 
-O **BusTracker** é um aplicativo web leve e mobile-first projetado para ajudar a prever horários de ônibus com base no seu histórico real de uso. Ele aprende com o tempo, ajustando-se a variações de trânsito, dias da semana e horários específicos.
+O **BoraBus** é um aplicativo web leve e mobile-first projetado para ajudar a prever horários de ônibus com base no seu histórico real de uso. Ele aprende com o tempo, ajustando-se a variações de trânsito, dias da semana e horários específicos.
 
 Tudo é salvo localmente no seu próprio celular ou navegador usando **IndexedDB**, garantindo privacidade total e carregamento instantâneo.
 

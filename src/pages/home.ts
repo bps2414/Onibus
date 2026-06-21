@@ -82,7 +82,7 @@ function handlePwaInstallBanner(): void {
             ${getIcon('import', 24)}
           </div>
           <div>
-            <h4 style="font-weight: 600; font-size: 15px; margin-bottom: 2px;">Instale o BusTracker</h4>
+            <h4 style="font-weight: 600; font-size: 15px; margin-bottom: 2px;">Instalar o BoraBus</h4>
             <p style="font-size: 13px; color: var(--text-secondary);">Acesse mais rápido e use 100% offline direto da tela inicial.</p>
           </div>
         </div>
@@ -109,7 +109,7 @@ function handlePwaInstallBanner(): void {
 
       // Aguarda a resposta do usuário
       const { outcome } = await promptEvent.userChoice;
-      console.log(`[BusTracker PWA] Usuário respondeu ao prompt com: ${outcome}`);
+      console.log(`[BoraBus PWA] Usuário respondeu ao prompt com: ${outcome}`);
 
       // Limpa o prompt para não ser reutilizado
       (window as any).deferredPrompt = null;
@@ -149,7 +149,7 @@ function sendAlarmToServiceWorker(
   }
 
   // Prepara o título e o corpo da notificação
-  const title = 'BusTracker: Ônibus Chegando!';
+  const title = 'BoraBus: Ônibus Chegando!';
   const body = `Seu ônibus do trajeto (Linha ${lineName}) está previsto para chegar em breve (às ${scheduledTime}). Vá para o ponto!`;
 
   navigator.serviceWorker.controller.postMessage({
@@ -278,9 +278,9 @@ export async function initHomePage(): Promise<void> {
   handlePwaInstallBanner();
 
   // Limpa qualquer temporizador anterior existente para evitar vazamento de memória e acúmulos
-  if ((window as any).busTrackerCountdownInterval) {
-    window.clearInterval((window as any).busTrackerCountdownInterval);
-    (window as any).busTrackerCountdownInterval = null;
+  if ((window as any).boraBusCountdownInterval) {
+    window.clearInterval((window as any).boraBusCountdownInterval);
+    (window as any).boraBusCountdownInterval = null;
   }
 
   // Define um intervalo para atualizar o countdown a cada segundo
@@ -292,7 +292,7 @@ export async function initHomePage(): Promise<void> {
   }, 1000);
 
   // Compartilha o ID do timer globalmente
-  (window as any).busTrackerCountdownInterval = intervalId;
+  (window as any).boraBusCountdownInterval = intervalId;
 }
 
 /**
@@ -485,7 +485,7 @@ async function updateTrackerView(presetId: string): Promise<void> {
         localStorage.removeItem(`alarm-scheduled-${preset.id}`);
 
         if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification('BusTracker: Hora de Sair!', {
+          new Notification('BoraBus: Hora de Sair!', {
             body: `Você está atrasado para o ônibus da Linha ${line?.number || ''}! Previsão de chegada no ponto: ${prediction.predictedBusArrival}. Vá correndo!`,
             icon: '/favicon.ico',
             vibrate: [200, 100, 200, 100, 300]

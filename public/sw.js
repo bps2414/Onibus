@@ -2,7 +2,7 @@
 // sw.js — Service Worker do PWA para suporte offline e alarmes
 // ============================================================
 
-const CACHE_NAME = 'bustracker-cache-v2';
+const CACHE_NAME = 'borabus-cache-v2';
 
 // Recursos mínimos estáticos conhecidos que sempre existem
 const PRECACHE_ASSETS = [
@@ -17,7 +17,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(PRECACHE_ASSETS).catch((err) => {
-        console.warn('[BusTracker PWA] Falha ao pré-cachear assets estáticos iniciais:', err);
+        console.warn('[BoraBus PWA] Falha ao pré-cachear assets estáticos iniciais:', err);
       });
     })
   );
@@ -32,7 +32,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((name) => {
           if (name !== CACHE_NAME) {
-            console.log('[BusTracker PWA] Apagando cache antigo:', name);
+            console.log('[BoraBus PWA] Apagando cache antigo:', name);
             return caches.delete(name);
           }
         })
@@ -112,25 +112,25 @@ self.addEventListener('message', (event) => {
     if (activeAlarms[id]) {
       clearTimeout(activeAlarms[id]);
       delete activeAlarms[id];
-      console.log(`[BusTracker SW] Alarme cancelado para reagendamento: ${id}`);
+      console.log(`[BoraBus SW] Alarme cancelado para reagendamento: ${id}`);
     }
 
     // 2. Cria um novo temporizador
     if (delayMs > 0) {
-      console.log(`[BusTracker SW] Agendando alarme para ${id} em ${delayMs}ms`);
+      console.log(`[BoraBus SW] Agendando alarme para ${id} em ${delayMs}ms`);
       activeAlarms[id] = setTimeout(() => {
         // Dispara a notificação de forma nativa
         self.registration.showNotification(title, {
           body: body,
           icon: '/icons/icon-192.png',
           vibrate: [200, 100, 200, 100, 300], // Vibração personalizada
-          tag: 'bustracker-alert', // Substitui alertas anteriores se houver
+          tag: 'borabus-alert', // Substitui alertas anteriores se houver
           data: { presetId: id }
         });
         
         // Remove da lista de ativos
         delete activeAlarms[id];
-        console.log(`[BusTracker SW] Alarme disparado e limpo: ${id}`);
+        console.log(`[BoraBus SW] Alarme disparado e limpo: ${id}`);
       }, delayMs);
     }
   } 
@@ -139,7 +139,7 @@ self.addEventListener('message', (event) => {
     if (activeAlarms[id]) {
       clearTimeout(activeAlarms[id]);
       delete activeAlarms[id];
-      console.log(`[BusTracker SW] Alarme cancelado: ${id}`);
+      console.log(`[BoraBus SW] Alarme cancelado: ${id}`);
     }
   }
 });

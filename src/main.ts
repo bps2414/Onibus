@@ -20,9 +20,9 @@ import { initThemeToggle, applyThemeToDocument } from './components/theme-toggle
  */
 async function navigate(hash: string) {
   // Limpa o timer do countdown ativo ao sair da home
-  if ((window as any).busTrackerCountdownInterval) {
-    clearInterval((window as any).busTrackerCountdownInterval);
-    (window as any).busTrackerCountdownInterval = null;
+  if ((window as any).boraBusCountdownInterval) {
+    clearInterval((window as any).boraBusCountdownInterval);
+    (window as any).boraBusCountdownInterval = null;
   }
 
   const app = document.getElementById('app');
@@ -92,10 +92,10 @@ function registerServiceWorker() {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js')
         .then((reg) => {
-          console.log('[BusTracker PWA] Service Worker registrado com sucesso no escopo:', reg.scope);
+          console.log('[BoraBus PWA] Service Worker registrado com sucesso no escopo:', reg.scope);
         })
         .catch((err) => {
-          console.error('[BusTracker PWA] Falha ao registrar o Service Worker:', err);
+          console.error('[BoraBus PWA] Falha ao registrar o Service Worker:', err);
         });
     });
   }

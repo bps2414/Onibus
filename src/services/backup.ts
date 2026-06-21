@@ -64,17 +64,17 @@ export async function exportBackup(period = 'all', format = 'json'): Promise<voi
   let shareText: string
 
   if (format === 'json') {
-    filename = `bustracker-backup-${currentDate()}.json`
+    filename = `borabus-backup-${currentDate()}.json`
     const jsonStr = JSON.stringify(allData, null, 2)
     blob = new Blob([jsonStr], { type: 'application/json' })
-    shareTitle = 'Backup do BusTracker'
-    shareText = 'Aqui estão as minhas configurações e histórico de viagens do BusTracker!'
+    shareTitle = 'Backup do BoraBus'
+    shareText = 'Aqui estão as minhas configurações e histórico de viagens do BoraBus!'
   } else {
-    filename = `bustracker-relatorio-${currentDate()}.txt`
+    filename = `borabus-relatorio-${currentDate()}.txt`
     const reportText = generateReadableReport(allData, period)
     blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' })
-    shareTitle = 'Relatório de Trânsito BusTracker'
-    shareText = 'Aqui está o meu relatório com estatísticas de trânsito do ônibus!'
+    shareTitle = 'Relatório de Trânsito BoraBus'
+    shareText = 'Aqui está o meu relatório com estatísticas de trânsito do BoraBus!'
   }
 
   const file = new File([blob], filename, { type: blob.type })
