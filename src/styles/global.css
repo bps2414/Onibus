@@ -4,46 +4,49 @@
 
 /* Variáveis para os temas (Dark Mode padrão, Light Mode opcional) */
 :root {
-  --font-sans: 'Geist Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Geist Sans', 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Geist Mono', 'SF Mono', ui-monospace, monospace;
   
-  /* Tema Dark (Padrão) */
-  --bg: #0a0a0f;
-  --surface: #16161e;
-  --surface-hover: #1e1e2a;
-  --accent: #6366f1;
-  --accent-hover: #818cf8;
-  --success: #22c55e;
+  /* Tema Dark (Padrão) - Zinc & Transit Orange */
+  --bg: #09090b;
+  --surface: #18181b;
+  --surface-hover: #27272a;
+  --accent: #f97316;
+  --accent-hover: #ea580c;
+  --accent-rgb: 249, 115, 22;
+  --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
-  --text: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --border: #2d2d3d;
+  --text: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --border: #27272a;
   --radius: 12px;
   --radius-lg: 16px;
-  --radius-sm: 8px;
-  --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.35), 0 4px 12px -2px rgba(0, 0, 0, 0.2);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
-  --glass-bg: rgba(22, 22, 30, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.05);
+  --radius-sm: 6px;
+  --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --glass-bg: rgba(24, 24, 27, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.04);
 }
 
 [data-theme="light"] {
-  /* Tema Light */
-  --bg: #f8fafc;
+  /* Tema Light - Zinc & Transit Orange */
+  --bg: #fafafa;
   --surface: #ffffff;
-  --surface-hover: #f1f5f9;
-  --accent: #4f46e5;
-  --accent-hover: #6366f1;
-  --success: #16a34a;
+  --surface-hover: #f4f4f5;
+  --accent: #ea580c;
+  --accent-hover: #c2410c;
+  --accent-rgb: 234, 88, 12;
+  --success: #059669;
   --warning: #d97706;
   --danger: #dc2626;
-  --text: #1e293b;
-  --text-secondary: #64748b;
-  --border: #e2e8f0;
-  --shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 4px 12px -2px rgba(0, 0, 0, 0.02);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.01);
+  --text: #09090b;
+  --text-secondary: #71717a;
+  --border: #e4e4e7;
+  --shadow: 0 4px 20px -2px rgba(9, 9, 11, 0.03);
+  --shadow-sm: 0 2px 8px rgba(9, 9, 11, 0.02);
   --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(0, 0, 0, 0.05);
+  --glass-border: rgba(9, 9, 11, 0.05);
 }
 
 /* Reset básico */
@@ -62,7 +65,7 @@ html {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 body {
@@ -148,7 +151,7 @@ p {
 }
 
 .card:hover {
-  border-color: rgba(99, 102, 241, 0.2);
+  border-color: rgba(var(--accent-rgb), 0.25);
 }
 
 /* Inputs e Seletores */
@@ -179,7 +182,7 @@ p {
 .input:focus,
 .select:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.15);
 }
 
 /* Botões */
@@ -199,7 +202,7 @@ p {
 }
 
 .btn:active {
-  transform: scale(0.97);
+  transform: scale(0.96) translateY(0.5px);
 }
 
 .btn-primary {
@@ -316,7 +319,7 @@ p {
 .navbar-item.active::after {
   background-color: var(--accent);
   transform: scale(1.2);
-  box-shadow: 0 0 8px var(--accent);
+  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.4);
 }
 
 .navbar-item.active {
@@ -373,14 +376,15 @@ p {
   margin: 16px 0;
   padding: 12px;
   border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(99, 102, 241, 0.02) 100%);
-  border: 1px dashed rgba(99, 102, 241, 0.2);
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.05) 0%, rgba(var(--accent-rgb), 0.02) 100%);
+  border: 1px dashed rgba(var(--accent-rgb), 0.2);
 }
 
 .countdown {
-  font-size: 48px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-family: var(--font-mono);
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
   display: inline-block;
 }
 
@@ -640,6 +644,7 @@ p {
 }
 
 .stat-value {
+  font-family: var(--font-mono);
   font-size: 20px;
   font-weight: 700;
   color: var(--text);
@@ -703,6 +708,7 @@ p {
   top: -24px;
   left: 50%;
   transform: translateX(-50%);
+  font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 700;
   color: var(--text);
@@ -717,7 +723,8 @@ p {
 .chart-label {
   flex: 1;
   text-align: center;
-  font-size: 11px;
+  font-family: var(--font-mono);
+  font-size: 10px;
   color: var(--text-secondary);
   font-weight: 500;
 }
@@ -770,12 +777,14 @@ p {
 }
 
 .record-times {
+  font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
 }
 
 .record-diff {
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
 }
@@ -789,7 +798,8 @@ p {
 }
 
 .record-duration {
-  font-size: 11px;
+  font-family: var(--font-mono);
+  font-size: 10px;
   color: var(--text-secondary);
 }
 
@@ -849,7 +859,7 @@ p {
 }
 
 .emoji-option.selected {
-  background-color: rgba(99, 102, 241, 0.15);
+  background-color: rgba(var(--accent-rgb), 0.15);
   border-color: var(--accent);
   box-shadow: 0 0 0 2px var(--accent);
 }
@@ -962,12 +972,16 @@ p {
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .card {
+  box-shadow: var(--shadow), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
 }
 
 .card:hover {
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 8px 32px 0 rgba(99, 102, 241, 0.08);
+  border-color: rgba(var(--accent-rgb), 0.35);
+  box-shadow: var(--shadow), 0 8px 32px 0 rgba(var(--accent-rgb), 0.08);
 }
 
 /* Estilos Pulsantes para Contagem Regressiva */
@@ -1027,7 +1041,7 @@ p {
 }
 
 .btn-icon.active {
-  background-color: rgba(99, 102, 241, 0.15);
+  background-color: rgba(var(--accent-rgb), 0.15);
   border-color: var(--accent);
   color: var(--accent-hover);
 }
@@ -1061,7 +1075,7 @@ p {
 
 .icon-option.selected {
   border-color: var(--accent);
-  background-color: rgba(99, 102, 241, 0.12);
+  background-color: rgba(var(--accent-rgb), 0.12);
   color: var(--accent-hover);
   box-shadow: 0 0 0 2px var(--accent);
 }

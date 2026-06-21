@@ -4,6 +4,7 @@
 
 import { getSettings, saveSettings } from '../db/database';
 import { showToast } from './toast';
+import { getIcon } from './icons';
 
 /**
  * Renderiza o botão HTML do alternador de temas.
@@ -13,7 +14,7 @@ import { showToast } from './toast';
 export function renderThemeToggle(): string {
   return `
     <button class="theme-btn" id="theme-toggle-btn" title="Alternar tema" aria-label="Alternar tema">
-      🌙
+      ${getIcon('sun', 16)}
     </button>
   `;
 }
@@ -43,7 +44,7 @@ export async function initThemeToggle(): Promise<void> {
   const currentTheme = settings.theme || 'dark';
 
   // Atualiza o ícone do botão com base no tema ativo
-  button.innerHTML = currentTheme === 'light' ? '🌙' : '☀️';
+  button.innerHTML = currentTheme === 'light' ? getIcon('moon', 16) : getIcon('sun', 16);
 
   // Adiciona o listener para alternar entre claro e escuro
   button.addEventListener('click', async () => {
@@ -57,9 +58,10 @@ export async function initThemeToggle(): Promise<void> {
     await saveSettings({ theme: nextTheme });
 
     // Atualiza o ícone visual
-    button.innerHTML = nextTheme === 'light' ? '🌙' : '☀️';
+    button.innerHTML = nextTheme === 'light' ? getIcon('moon', 16) : getIcon('sun', 16);
 
     // Exibe um toast de confirmação
     showToast(`Tema alterado para modo ${nextTheme === 'dark' ? 'escuro' : 'claro'}!`, 'success');
   });
 }
+
