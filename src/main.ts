@@ -56,7 +56,7 @@ async function navigate(hash: string) {
   }
 
   // Atualiza o DOM e adiciona a barra de navegação correspondente
-  app.innerHTML = `<div class="page-content">${html}</div>` + renderNavbar(page);
+  app.innerHTML = `<div class="page-content" data-page="${page}">${html}</div>` + renderNavbar(page);
 
   // Inicializa a lógica interativa (event listeners) da página ativa
   switch (page) {

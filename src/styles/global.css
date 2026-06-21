@@ -1163,3 +1163,228 @@ svg {
   transition: stroke 0.2s ease, fill 0.2s ease;
 }
 
+/* Logo desktop ocultada por padrão no mobile */
+.navbar-logo-desktop {
+  display: none;
+}
+
+/* Wrapper dos itens da navbar para manter comportamento mobile-first */
+.navbar-items-wrapper {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================================
+   Layout Responsivo para Telas Desktop (>= 1024px)
+   ============================================================ */
+@media (min-width: 1024px) {
+  /* Estrutura Geral (Dashboard) */
+  #app {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 32px 32px 288px; /* 288px = 256px sidebar + 32px gap */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-content {
+    width: 100%;
+    max-width: 1080px;
+  }
+
+  /* Barra Lateral de Navegação (Sidebar) */
+  .navbar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 256px;
+    height: 100vh;
+    transform: none;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 40px 24px;
+    border-radius: 0;
+    border: none;
+    border-right: 1px solid var(--border);
+    background-color: var(--surface);
+    box-shadow: none;
+    gap: 32px;
+  }
+
+  .navbar-logo-desktop {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    padding: 0 12px;
+  }
+
+  .navbar-logo-icon {
+    font-size: 24px;
+  }
+
+  .navbar-items-wrapper {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 8px;
+    height: auto;
+  }
+
+  .navbar-item {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 12px 16px;
+    height: auto;
+    width: 100%;
+    border-radius: var(--radius);
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  .navbar-item:hover {
+    background-color: var(--surface-hover);
+    color: var(--text);
+  }
+
+  .navbar-item .navbar-item-icon {
+    font-size: 20px;
+    transform: none !important;
+  }
+
+  .navbar-item:hover .navbar-item-icon {
+    transform: translateX(3px) !important;
+  }
+
+  .navbar-item::after {
+    display: none; /* Remove o ponto ativo de mobile */
+  }
+
+  .navbar-item.active {
+    background-color: rgba(var(--accent-rgb), 0.08);
+    color: var(--accent);
+  }
+
+  .navbar-item.active .navbar-item-icon {
+    transform: none !important;
+  }
+
+  /* Botão de Tema Fixo */
+  .theme-btn {
+    position: fixed;
+    top: 32px;
+    right: 32px;
+    z-index: 150;
+    box-shadow: var(--shadow);
+  }
+
+  /* 1. Responsividade na HOME */
+  .page-content[data-page="home"] .app-header {
+    display: none; /* Esconde logo redundante na home */
+  }
+
+  #home-tracker-content {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 32px;
+    align-items: start;
+    margin-top: 16px;
+  }
+
+  #home-tracker-content > .card:first-of-type {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    margin-bottom: 0;
+  }
+
+  #home-tracker-content > div[style*="display: grid"] {
+    grid-column: 2;
+    grid-row: 1;
+    margin-bottom: 0 !important;
+  }
+
+  #home-tracker-content > div[style*="margin-top"] {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: 0 !important;
+  }
+
+  /* 2. Responsividade na GERENCIAR */
+  .tab-content {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .tab-content > .card:first-of-type {
+    grid-column: 1;
+    margin-bottom: 0;
+  }
+
+  .tab-content > .card:last-of-type {
+    grid-column: 2;
+    margin-bottom: 0;
+  }
+
+  #tab-schedules {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  #tab-schedules > #schedules-list-card {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin-bottom: 0;
+  }
+
+  /* 3. Responsividade na ESTATÍSTICAS */
+  #stats-page-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  #stats-page-content > .stats-grid {
+    grid-column: 1 / span 2;
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  #stats-page-content > .card {
+    margin-bottom: 0 !important;
+  }
+
+  /* 4. Responsividade na IA */
+  #ai-page-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  #ai-page-content > .card {
+    margin-bottom: 0 !important;
+  }
+
+  #ai-page-content > .card:first-child {
+    grid-column: 1 / span 2;
+  }
+}
+
+
