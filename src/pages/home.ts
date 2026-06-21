@@ -127,6 +127,41 @@ function handlePwaInstallBanner(): void {
 }
 
 /**
+ * Envia uma mensagem para o Service Worker para agendar ou cancelar um alarme.
+ */
+function sendAlarmToServiceWorker(
+  presetId: string,
+  delayMs: number,
+  scheduledTime: string,
+  lineName: string,
+  isCancellation = false
+): void {
+  if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
+    return;
+  }
+
+  if (isCancellation) {
+    navigator.serviceWorker.controller.postMessage({
+      type: 'CANCEL_ALARM',
+      id: presetId
+    });
+    return;
+  }
+
+  // Prepara o título e o corpo da notificação
+  const title = 'BusTracker: Ônibus Chegando!';
+  const body = `Seu ônibus do trajeto (Linha ${lineName}) está previsto para chegar em breve (às ${scheduledTime}). Vá para o ponto!`;
+
+  navigator.serviceWorker.controller.postMessage({
+    type: 'SCHEDULE_ALARM',
+    id: presetId,
+    delayMs,
+    title,
+    body
+  });
+}
+
+/**
  * Inicializa a lógica da página Home.
  * Popula o seletor de presets, escuta mudanças, registra as notificações e inicia o intervalo do timer.
  */
@@ -224,6 +259,11 @@ export async function initHomePage(): Promise<void> {
       // Desativa
       localStorage.setItem(`notify-preset-${currentPresetId}`, 'false');
       updateNotifyButtonState(currentPresetId);
+      
+      // Cancela o alarme no Service Worker
+      sendAlarmToServiceWorker(currentPresetId, 0, '', '', true);
+      localStorage.removeItem(`alarm-scheduled-${currentPresetId}`);
+      
       showToast('Alertas desativados para este trajeto.', 'info');
     }
   });
@@ -387,28 +427,61 @@ async function updateTrackerView(presetId: string): Promise<void> {
   // Calcula os minutos restantes até a chegada prevista
   const minutesLeft = minutesUntilArrival(prediction);
 
-  // Lógica de Notificações nativas no celular
-  const isNotifEnabled = localStorage.getItem(`notify-preset-${preset.id}`) === 'true';
-  if (isNotifEnabled && 'Notification' in window && Notification.permission === 'granted') {
-    // Alerta disparado quando o ônibus está entre 1 e 5 minutos de distância
-    if (minutesLeft > 0 && minutesLeft <= 5) {
-      const notifiedKey = `${preset.id}-${prediction.scheduledDeparture}-${currentDate()}`;
-      if (!notifiedTrips[notifiedKey]) {
-        notifiedTrips[notifiedKey] = true;
-        new Notification('BusTracker: Ônibus Chegando!', {
-          body: `O ônibus do trajeto "${preset.name}" (Linha ${line.number}) está previsto para chegar em ${minutesLeft} min (às ${prediction.predictedBusArrival}). Vá para o ponto!`,
-          icon: '/favicon.ico'
-        });
-      }
-    }
-  }
-
   // Calcula margem de segurança (Buffer Time)
   const buffer = preset.bufferTime ?? 0;
   const walkTime = preset.estimatedBoardingOffset;
   const totalOffset = walkTime + buffer;
   const timeToLeave = addMinutes(prediction.predictedBusArrival, -totalOffset);
   const minutesToLeave = timeDiffMinutes(currentTime(), timeToLeave);
+
+  // Lógica de Notificações Inteligentes (Offline e Background via Service Worker)
+  const isNotifEnabled = localStorage.getItem(`notify-preset-${preset.id}`) === 'true';
+  if (isNotifEnabled) {
+    const notifiedKey = `${preset.id}-${prediction.scheduledDeparture}-${currentDate()}`;
+
+    if (minutesToLeave > 0) {
+      // O alarme deve tocar no futuro. Agendamos/reagendamos no Service Worker.
+      const delayMs = minutesToLeave * 60 * 1000;
+      const lastScheduled = localStorage.getItem(`alarm-scheduled-${preset.id}`);
+      const newScheduleValue = `${prediction.predictedBusArrival}-${delayMs}`;
+
+      if (lastScheduled !== newScheduleValue) {
+        localStorage.setItem(`alarm-scheduled-${preset.id}`, newScheduleValue);
+        sendAlarmToServiceWorker(
+          preset.id,
+          delayMs,
+          prediction.predictedBusArrival,
+          line?.number || preset.lineId
+        );
+      }
+    } else if (minutesToLeave <= 0 && minutesLeft > 0) {
+      // O usuário está atrasado para a saída recomendada, mas o ônibus ainda não passou.
+      // Mostramos notificação imediata se ainda não foi disparada hoje para esta viagem.
+      if (!notifiedTrips[notifiedKey]) {
+        notifiedTrips[notifiedKey] = true;
+        
+        // Cancela qualquer alarme pendente no SW
+        sendAlarmToServiceWorker(preset.id, 0, '', '', true);
+        localStorage.removeItem(`alarm-scheduled-${preset.id}`);
+
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('BusTracker: Hora de Sair!', {
+            body: `Você está atrasado para o ônibus da Linha ${line?.number || ''}! Previsão de chegada no ponto: ${prediction.predictedBusArrival}. Vá correndo!`,
+            icon: '/favicon.ico',
+            vibrate: [200, 100, 200, 100, 300]
+          } as any);
+        }
+      }
+    } else {
+      // O ônibus já passou. Limpamos o alarme.
+      sendAlarmToServiceWorker(preset.id, 0, '', '', true);
+      localStorage.removeItem(`alarm-scheduled-${preset.id}`);
+    }
+  } else {
+    // Alertas desativados. Garantimos que nenhum temporizador fique ativo.
+    sendAlarmToServiceWorker(preset.id, 0, '', '', true);
+    localStorage.removeItem(`alarm-scheduled-${preset.id}`);
+  }
 
   // Renderiza os componentes de UI
   const countdownHtml = renderCountdown(minutesLeft);

@@ -1,5 +1,5 @@
 // ============================================================
-// sw.js — Service Worker do PWA para suporte offline
+// sw.js — Service Worker do PWA para suporte offline e alarmes
 // ============================================================
 
 const CACHE_NAME = 'bustracker-cache-v2';
@@ -92,5 +92,73 @@ self.addEventListener('fetch', (event) => {
           });
         });
       })
+  );
+});
+
+// ─── LÓGICA DE ALARMES EM SEGUNDO PLANO ──────────────────────────────────────
+
+// Dicionário para gerenciar temporizadores ativos
+const activeAlarms = {};
+
+// Escuta mensagens vindas do frontend (home.ts)
+self.addEventListener('message', (event) => {
+  const data = event.data;
+  if (!data || !data.type) return;
+
+  const { type, id, delayMs, title, body } = data;
+
+  if (type === 'SCHEDULE_ALARM') {
+    // 1. Limpa o alarme anterior se já existir um para o mesmo ID
+    if (activeAlarms[id]) {
+      clearTimeout(activeAlarms[id]);
+      delete activeAlarms[id];
+      console.log(`[BusTracker SW] Alarme cancelado para reagendamento: ${id}`);
+    }
+
+    // 2. Cria um novo temporizador
+    if (delayMs > 0) {
+      console.log(`[BusTracker SW] Agendando alarme para ${id} em ${delayMs}ms`);
+      activeAlarms[id] = setTimeout(() => {
+        // Dispara a notificação de forma nativa
+        self.registration.showNotification(title, {
+          body: body,
+          icon: '/icons/icon-192.png',
+          vibrate: [200, 100, 200, 100, 300], // Vibração personalizada
+          tag: 'bustracker-alert', // Substitui alertas anteriores se houver
+          data: { presetId: id }
+        });
+        
+        // Remove da lista de ativos
+        delete activeAlarms[id];
+        console.log(`[BusTracker SW] Alarme disparado e limpo: ${id}`);
+      }, delayMs);
+    }
+  } 
+  
+  else if (type === 'CANCEL_ALARM') {
+    if (activeAlarms[id]) {
+      clearTimeout(activeAlarms[id]);
+      delete activeAlarms[id];
+      console.log(`[BusTracker SW] Alarme cancelado: ${id}`);
+    }
+  }
+});
+
+// Escuta o clique na notificação para focar no app
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close(); // Fecha o banner da notificação
+
+  // Abre ou foca a janela do aplicativo
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url.startsWith(self.location.origin) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (self.clients.openWindow) {
+        return self.clients.openWindow('/');
+      }
+    })
   );
 });
