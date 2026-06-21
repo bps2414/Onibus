@@ -36,6 +36,9 @@ export async function renderHomePage(): Promise<string> {
       ${themeToggleHtml}
     </div>
 
+    <!-- Container para o Banner de Instalação do PWA -->
+    <div id="pwa-install-container"></div>
+
     <div class="card" style="margin-bottom: 20px; padding: 12px 16px;">
       <label class="label" for="preset-selector">Trajeto Ativo</label>
       <div style="display: flex; gap: 8px; align-items: center;">
@@ -55,6 +58,75 @@ export async function renderHomePage(): Promise<string> {
 }
 
 /**
+ * Renderiza e gerencia o banner de instalação do PWA se aplicável.
+ */
+function handlePwaInstallBanner(): void {
+  const container = document.getElementById('pwa-install-container');
+  if (!container) return;
+
+  const deferredPrompt = (window as any).deferredPrompt;
+  const isDismissed = sessionStorage.getItem('pwa-banner-dismissed') === 'true';
+
+  // Se não temos o prompt de instalação disponível ou se o usuário já fechou nesta sessão
+  if (!deferredPrompt || isDismissed) {
+    container.innerHTML = '';
+    return;
+  }
+
+  // Desenha o banner
+  container.innerHTML = `
+    <div class="card pwa-banner" style="margin-bottom: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px; border-left: 4px solid var(--accent); background: var(--surface); animation: fadeIn 0.3s ease;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <div style="color: var(--accent); display: flex; align-items: center;">
+            ${getIcon('import', 24)}
+          </div>
+          <div>
+            <h4 style="font-weight: 600; font-size: 15px; margin-bottom: 2px;">Instale o BusTracker</h4>
+            <p style="font-size: 13px; color: var(--text-secondary);">Acesse mais rápido e use 100% offline direto da tela inicial.</p>
+          </div>
+        </div>
+        <button id="btn-pwa-dismiss" class="btn-icon" style="padding: 4px; margin: -4px -4px 0 0; color: var(--text-secondary);" title="Fechar">
+          ${getIcon('close', 18)}
+        </button>
+      </div>
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        <button id="btn-pwa-install" class="btn-primary" style="padding: 6px 16px; font-size: 13px; border-radius: var(--radius-sm);">Instalar</button>
+      </div>
+    </div>
+  `;
+
+  const btnInstall = document.getElementById('btn-pwa-install');
+  const btnDismiss = document.getElementById('btn-pwa-dismiss');
+
+  if (btnInstall) {
+    btnInstall.addEventListener('click', async () => {
+      const promptEvent = (window as any).deferredPrompt;
+      if (!promptEvent) return;
+
+      // Dispara o prompt de instalação nativo
+      promptEvent.prompt();
+
+      // Aguarda a resposta do usuário
+      const { outcome } = await promptEvent.userChoice;
+      console.log(`[BusTracker PWA] Usuário respondeu ao prompt com: ${outcome}`);
+
+      // Limpa o prompt para não ser reutilizado
+      (window as any).deferredPrompt = null;
+      container.innerHTML = '';
+    });
+  }
+
+  if (btnDismiss) {
+    btnDismiss.addEventListener('click', () => {
+      // Salva na sessão para não perturbar o usuário nesta sessão
+      sessionStorage.setItem('pwa-banner-dismissed', 'true');
+      container.innerHTML = '';
+    });
+  }
+}
+
+/**
  * Inicializa a lógica da página Home.
  * Popula o seletor de presets, escuta mudanças, registra as notificações e inicia o intervalo do timer.
  */
@@ -62,6 +134,18 @@ export async function initHomePage(): Promise<void> {
   const presetSelector = document.getElementById('preset-selector') as HTMLSelectElement;
   const btnNotifyToggle = document.getElementById('btn-notify-toggle') as HTMLButtonElement;
   if (!presetSelector || !btnNotifyToggle) return;
+
+  // Limpa listener do PWA antigo se existir para evitar vazamento de memória
+  if ((window as any).pwaInstallListener) {
+    window.removeEventListener('can-install-pwa', (window as any).pwaInstallListener);
+  }
+
+  // Define e adiciona o novo listener para atualizar o banner reativamente
+  const canInstallListener = () => {
+    handlePwaInstallBanner();
+  };
+  (window as any).pwaInstallListener = canInstallListener;
+  window.addEventListener('can-install-pwa', canInstallListener);
 
   // Busca presets e configurações
   const presets = await getAll<Preset>('presets');
@@ -74,6 +158,8 @@ export async function initHomePage(): Promise<void> {
     presetSelector.innerHTML = '<option value="none">Nenhum trajeto salvo</option>';
     btnNotifyToggle.style.display = 'none';
     renderEmptyState();
+    // Renderiza o banner de instalação mesmo em estado vazio
+    handlePwaInstallBanner();
     return;
   }
 
@@ -147,6 +233,9 @@ export async function initHomePage(): Promise<void> {
 
   // Executa a primeira renderização do painel de rastreamento
   await updateTrackerView(activePresetId);
+
+  // Renderiza o banner de instalação se elegível
+  handlePwaInstallBanner();
 
   // Limpa qualquer temporizador anterior existente para evitar vazamento de memória e acúmulos
   if ((window as any).busTrackerCountdownInterval) {

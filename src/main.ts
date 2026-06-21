@@ -85,6 +85,34 @@ async function navigate(hash: string) {
 }
 
 /**
+ * Registra o Service Worker do PWA se suportado pelo navegador e em produção.
+ */
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator && import.meta.env.PROD) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => {
+          console.log('[BusTracker PWA] Service Worker registrado com sucesso no escopo:', reg.scope);
+        })
+        .catch((err) => {
+          console.error('[BusTracker PWA] Falha ao registrar o Service Worker:', err);
+        });
+    });
+  }
+}
+
+// Escuta o evento de instalação do PWA
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Impede o prompt nativo imediato
+  e.preventDefault();
+  // Guarda o evento para uso na tela Home
+  (window as any).deferredPrompt = e;
+  
+  // Dispara evento global para avisar a Home caso ela já esteja ativa
+  window.dispatchEvent(new CustomEvent('can-install-pwa'));
+});
+
+/**
  * Inicialização (Bootstrap) do aplicativo.
  * Garante que o IndexedDB está pronto e o tema está aplicado antes de desenhar a tela.
  */
@@ -103,6 +131,9 @@ async function bootstrap() {
 
     // Navega para a página inicial baseada no hash da URL ao abrir o app
     await navigate(window.location.hash);
+
+    // Registra o Service Worker do PWA
+    registerServiceWorker();
   } catch (err) {
     console.error('[BusTracker] Erro crítico ao inicializar o aplicativo:', err);
   }

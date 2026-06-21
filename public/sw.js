@@ -2,33 +2,31 @@
 // sw.js — Service Worker do PWA para suporte offline
 // ============================================================
 
-const CACHE_NAME = 'bustracker-cache-v1';
+const CACHE_NAME = 'bustracker-cache-v2';
 
-// Recursos básicos a serem cacheados imediatamente ao instalar o app
+// Recursos mínimos estáticos conhecidos que sempre existem
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
-  '/src/main.ts',
-  '/src/styles/global.css',
   '/favicon.ico',
   '/manifest.json'
 ];
 
 // Instala o service worker e pré-cacha os recursos básicos
-self.addEventListener('install', (event: any) => {
+self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(PRECACHE_ASSETS).catch(err => {
-        console.warn('[BusTracker PWA] Falha ao pré-cachear alguns assets (comum em modo Dev):', err);
+      return cache.addAll(PRECACHE_ASSETS).catch((err) => {
+        console.warn('[BusTracker PWA] Falha ao pré-cachear assets estáticos iniciais:', err);
       });
     })
   );
   // Força o Service Worker ativo a assumir o controle imediatamente
-  (self as any).skipWaiting();
+  self.skipWaiting();
 });
 
 // Ativa e limpa caches antigos se a versão mudar
-self.addEventListener('activate', (event: any) => {
+self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -41,22 +39,32 @@ self.addEventListener('activate', (event: any) => {
       );
     })
   );
-  (self as any).clients.claim();
+  self.clients.claim();
 });
 
-// Intercepta as requisições de rede
-// Estratégia: Network First, com Fallback para Cache.
-// Isso garante que você sempre tenha o código mais recente online, mas abra offline se não tiver internet.
-self.addEventListener('fetch', (event: any) => {
-  // Apenas intercepta requisições HTTP/S locais (ignora chrome-extensions, etc.)
+// Intercepta requisições
+// Estratégia: Network First com Fallback para Cache.
+// Assim, se houver rede, pegamos as atualizações mais recentes e atualizamos o cache.
+// Se estiver offline ou a rede falhar, servimos a versão do cache imediatamente.
+self.addEventListener('fetch', (event) => {
+  // Apenas intercepta requisições HTTP/S locais
   if (!event.request.url.startsWith(self.location.origin)) {
+    return;
+  }
+
+  // Ignora requisições de desenvolvimento do Vite (HMR) e node_modules
+  if (
+    event.request.url.includes('/@vite/') || 
+    event.request.url.includes('/@fs/') || 
+    event.request.url.includes('/node_modules/')
+  ) {
     return;
   }
 
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Se a resposta for válida, faz uma cópia no cache dinâmico
+        // Se a resposta for válida, coloca uma cópia no cache
         if (response && response.status === 200 && response.type === 'basic') {
           const responseCopy = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -66,21 +74,21 @@ self.addEventListener('fetch', (event: any) => {
         return response;
       })
       .catch(() => {
-        // Se falhar a rede (offline), busca no cache
+        // Falhou a rede (offline), busca no cache
         return caches.match(event.request).then((cachedResponse) => {
           if (cachedResponse) {
             return cachedResponse;
           }
           
-          // Se não achar nada no cache e for uma navegação de página, retorna o index.html principal
+          // Se for navegação de página html e não achar nada, retorna a raiz /
           if (event.request.headers.get('accept')?.includes('text/html')) {
             return caches.match('/');
           }
           
-          // Caso contrário, falha silenciosamente
           return new Response('Sem conexão com a internet e sem dados no cache.', {
             status: 503,
-            statusText: 'Service Unavailable'
+            statusText: 'Service Unavailable',
+            headers: new Headers({ 'Content-Type': 'text/plain; charset=utf-8' })
           });
         });
       })
