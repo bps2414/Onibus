@@ -493,8 +493,13 @@ async function updateTrackerView(presetId: string): Promise<void> {
   if (btnBusArrived) {
     btnBusArrived.addEventListener('click', async () => {
       // Registra a chegada do ônibus no ponto
-      const nowStr = currentTime();
-      const currentDayType = detectDayType(new Date());
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      const nowStr = `${h}:${m}`;
+      const nowWithSecondsStr = `${h}:${m}:${s}`;
+      const currentDayType = detectDayType(now);
 
       // Busca tabelas de horários do dia
       const daySchedules = await getSchedulesByLine(preset.lineId, currentDayType);
@@ -504,16 +509,35 @@ async function updateTrackerView(presetId: string): Promise<void> {
         return;
       }
 
-      // Encontra a partida programada mais próxima do horário real de agora
-      let closestSchedule = daySchedules[0];
-      let minDiff = Math.abs(timeDiffMinutes(closestSchedule.departureTime, nowStr));
+      // Calcula as diferenças absolutas em minutos para cada horário
+      const schedulesWithDiff = daySchedules.map(schedule => {
+        return {
+          schedule,
+          diff: Math.abs(timeDiffMinutes(schedule.departureTime, nowStr))
+        };
+      }).sort((a, b) => a.diff - b.diff);
 
-      for (const schedule of daySchedules) {
-        const diff = Math.abs(timeDiffMinutes(schedule.departureTime, nowStr));
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestSchedule = schedule;
-        }
+      let chosenSchedule = schedulesWithDiff[0].schedule;
+      
+      // Se houver mais de um horário e ambos estiverem a menos de 20 minutos de agora, há ambiguidade
+      const isAmbiguous = schedulesWithDiff.length > 1 && 
+                         schedulesWithDiff[0].diff <= 20 && 
+                         schedulesWithDiff[1].diff <= 20;
+
+      if (isAmbiguous) {
+        const opt1 = schedulesWithDiff[0].schedule.departureTime;
+        const opt2 = schedulesWithDiff[1].schedule.departureTime;
+        const chooseFirst = window.confirm(
+          `Identificamos dois horários próximos da tabela.\n\n` +
+          `Clique em OK para registrar para a saída das ${opt1}\n` +
+          `ou CANCELAR para registrar para a saída das ${opt2}.`
+        );
+        chosenSchedule = chooseFirst ? schedulesWithDiff[0].schedule : schedulesWithDiff[1].schedule;
+      } else {
+        const confirmReg = window.confirm(
+          `Deseja registrar o embarque para o ônibus com saída programada das ${chosenSchedule.departureTime}?`
+        );
+        if (!confirmReg) return; // Cancela o registro
       }
 
       // Cria o registro da viagem
@@ -521,10 +545,10 @@ async function updateTrackerView(presetId: string): Promise<void> {
         id: generateId(),
         presetId: preset.id,
         date: currentDate(),
-        dayOfWeek: new Date().getDay(),
+        dayOfWeek: now.getDay(),
         dayType: currentDayType,
-        scheduledDeparture: closestSchedule.departureTime,
-        busArrivedAt: nowStr
+        scheduledDeparture: chosenSchedule.departureTime,
+        busArrivedAt: nowWithSecondsStr
       };
 
       // Salva e atualiza o estado
