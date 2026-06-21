@@ -52,10 +52,10 @@ export function renderConfidenceInterval(
       margin-bottom: 10px;
     ">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <span style="font-size: 10px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.03em;">
+        <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;">
           Intervalo de Confiança
         </span>
-        <span style="font-size: 10px; font-weight: 600; color: ${barColor};">
+        <span style="font-size: 12px; font-weight: 600; color: ${barColor};">
           ${label} (±${halfSpread}min)
         </span>
       </div>
@@ -167,7 +167,7 @@ export function renderTrendBadge(
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       color: ${color};
       padding: 2px 8px;
@@ -195,7 +195,7 @@ export function renderOutlierBadge(count: number): string {
       display: inline-flex;
       align-items: center;
       gap: 3px;
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--warning);
       padding: 2px 6px;

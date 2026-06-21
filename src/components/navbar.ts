@@ -29,7 +29,7 @@ export function renderNavbar(activePage: string): string {
       return `
         <a href="${item.hash}" class="navbar-item ${isActive}" data-page="${item.id}">
           <span class="navbar-item-icon">${iconSvg}</span>
-          <span style="font-size: 10px; font-weight: 600;">${item.label}</span>
+          <span class="navbar-item-label">${item.label}</span>
         </a>
       `;
     })
@@ -40,7 +40,7 @@ export function renderNavbar(activePage: string): string {
       <!-- Logo visível apenas no layout desktop lateral -->
       <div class="navbar-logo-desktop">
         <span class="navbar-logo-icon">🚌</span>
-        <span>Bus<span class="app-title-accent">Tracker</span></span>
+        <span>Bora<span class="app-title-accent">Bus</span></span>
       </div>
       <div class="navbar-items-wrapper">
         ${itemsHtml}

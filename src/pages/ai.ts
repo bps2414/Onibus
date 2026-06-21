@@ -185,11 +185,11 @@ async function renderAiContent(presetId: string): Promise<void> {
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
         <div class="stat-card" style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: var(--radius); border: 1px solid var(--border);">
-          <div class="label" style="font-size: 10px; color: var(--text-secondary);">Viagens Registradas</div>
+          <div class="label" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; font-weight: 600; color: var(--text-secondary);">Viagens Registradas</div>
           <div style="font-size: 20px; font-weight: 700; margin-top: 4px;">${totalTrips}</div>
         </div>
         <div class="stat-card" style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: var(--radius); border: 1px solid var(--border);">
-          <div class="label" style="font-size: 10px; color: var(--text-secondary);">Outliers Filtrados</div>
+          <div class="label" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; font-weight: 600; color: var(--text-secondary);">Outliers Filtrados</div>
           <div style="font-size: 20px; font-weight: 700; margin-top: 4px; color: ${outlierCount > 0 ? 'var(--warning)' : 'inherit'};">
             ${outlierCount}
           </div>
@@ -198,13 +198,13 @@ async function renderAiContent(presetId: string): Promise<void> {
 
       <div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <span class="label" style="font-size: 11px; color: var(--text-secondary);">Confiabilidade do Trajeto</span>
+          <span class="label" style="font-size: 12px; color: var(--text-secondary);">Confiabilidade do Trajeto</span>
           <span style="font-weight: 700; color: ${scoreColor}; font-size: 14px;">${reliabilityScore}/100 (${scoreText})</span>
         </div>
         <div style="width: 100%; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;">
           <div style="width: ${reliabilityScore}%; height: 100%; background: ${scoreColor}; border-radius: 4px; transition: width 0.5s ease;"></div>
         </div>
-        <p style="font-size: 11px; color: var(--text-secondary); margin-top: 8px; line-height: 1.4;">
+        <p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px; line-height: 1.4;">
           Calculado com base na variação dos atrasos históricos. Quanto menor o desvio padrão das viagens, mais previsível e confiável é o horário do ônibus.
         </p>
       </div>
@@ -352,7 +352,7 @@ async function renderAiContent(presetId: string): Promise<void> {
             ${accuracyPct}% Acurácia
           </span>
         </div>
-        <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4;">
+        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4;">
           Precisão simulada retroativamente (margem de erro de ±3 minutos).
           Pontos acima de zero indicam que o ônibus chegou mais tarde que o previsto; pontos abaixo indicam que chegou mais cedo.
         </p>
@@ -400,52 +400,52 @@ async function renderAiContent(presetId: string): Promise<void> {
       <div style="display: flex; flex-direction: column; gap: 14px;">
         <div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span style="font-weight: 600; font-size: 12px; color: var(--text);">1. Recência (Tempo)</span>
-            <span style="font-size: 11px; color: var(--text-secondary);">Decai 5% ao dia</span>
+            <span style="font-weight: 600; font-size: 13px; color: var(--text);">1. Recência (Tempo)</span>
+            <span style="font-size: 12px; color: var(--text-secondary);">Decai 5% ao dia</span>
           </div>
           <div style="width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;">
             <div style="width: 80%; height: 100%; background: var(--accent); border-radius: 3px;"></div>
           </div>
-          <p style="font-size: 11px; color: var(--text-secondary); margin-top: 3px; line-height: 1.3;">
+          <p style="font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.3;">
             Registros novos têm alta prioridade. Viagens ocorridas há 30 dias perdem ~80% do peso de influência no cálculo.
           </p>
         </div>
 
         <div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span style="font-weight: 600; font-size: 12px; color: var(--text);">2. Dia da Semana</span>
-            <span style="font-size: 11px; color: var(--text-secondary);">Bônus de 1.0x a 0.1x</span>
+            <span style="font-weight: 600; font-size: 13px; color: var(--text);">2. Dia da Semana</span>
+            <span style="font-size: 12px; color: var(--text-secondary);">Bônus de 1.0x a 0.1x</span>
           </div>
           <div style="width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;">
             <div style="width: 90%; height: 100%; background: var(--accent); border-radius: 3px;"></div>
           </div>
-          <p style="font-size: 11px; color: var(--text-secondary); margin-top: 3px; line-height: 1.3;">
+          <p style="font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.3;">
             O tráfego de segunda-feira é diferente do de domingo. Viagens no mesmo dia da semana têm peso máximo.
           </p>
         </div>
 
         <div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span style="font-weight: 600; font-size: 12px; color: var(--text);">3. Horário e Faixa</span>
-            <span style="font-size: 11px; color: var(--text-secondary);">Janela de 1h + Bônus de Faixa</span>
+            <span style="font-weight: 600; font-size: 13px; color: var(--text);">3. Horário e Faixa</span>
+            <span style="font-size: 12px; color: var(--text-secondary);">Janela de 1h + Bônus de Faixa</span>
           </div>
           <div style="width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;">
             <div style="width: 75%; height: 100%; background: var(--accent); border-radius: 3px;"></div>
           </div>
-          <p style="font-size: 11px; color: var(--text-secondary); margin-top: 3px; line-height: 1.3;">
+          <p style="font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.3;">
             Horários próximos têm prioridade. Além disso, viagens na mesma faixa horária (ex: Rush) ganham 1.5x de bônus.
           </p>
         </div>
 
         <div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span style="font-weight: 600; font-size: 12px; color: var(--text);">4. Tendência (Regressão)</span>
-            <span style="font-size: 11px; color: var(--text-secondary);">Influência de 30% se estável</span>
+            <span style="font-weight: 600; font-size: 13px; color: var(--text);">4. Tendência (Regressão)</span>
+            <span style="font-size: 12px; color: var(--text-secondary);">Influência de 30% se estável</span>
           </div>
           <div style="width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;">
             <div style="width: 50%; height: 100%; background: var(--accent); border-radius: 3px;"></div>
           </div>
-          <p style="font-size: 11px; color: var(--text-secondary); margin-top: 3px; line-height: 1.3;">
+          <p style="font-size: 12px; color: var(--text-secondary); margin-top: 3px; line-height: 1.3;">
             Calcula se o ônibus está ficando mais lento nos últimos 14 dias. Se houver tendência clara, projeta essa variação.
           </p>
         </div>

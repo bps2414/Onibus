@@ -58,7 +58,7 @@ export function renderConfidence(
       <div class="confidence-bar-outer" style="margin: 8px 0;">
         <div class="confidence-bar-inner ${barColorClass}" style="width: ${confidence}%"></div>
       </div>
-      <div style="font-size: 11px; color: var(--text-secondary);">
+      <div style="font-size: 12px; color: var(--text-secondary);">
         ${recordCountText}
       </div>
     </div>
