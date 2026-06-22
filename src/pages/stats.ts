@@ -323,12 +323,16 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
     const tlH = timeChartHeight - tlPaddingT - tlPaddingB;
 
     const tripDelays = sortedRecords.map(r => getRecordDelay(r, baselines));
-    const maxTlDelay = Math.max(...tripDelays.map(Math.abs), 5);
+    let maxTlDelay = Math.max(...tripDelays, 5);
+    let minTlDelay = Math.min(...tripDelays, -5);
+    if (minTlDelay > 0) minTlDelay = 0;
+    
+    const rangeTl = maxTlDelay - minTlDelay || 1;
 
-    const getTlY = (d: number) => tlPaddingT + ((maxTlDelay - d) * tlH) / maxTlDelay;
+    const getTlY = (d: number) => tlPaddingT + ((maxTlDelay - d) / rangeTl) * tlH;
     const getTlX = (idx: number) => tlPaddingL + (idx * tlW) / (sortedRecords.length - 1);
 
-    const tlGridTicks = [0, maxTlDelay * 0.5, maxTlDelay];
+    const tlGridTicks = Array.from(new Set([minTlDelay, 0, maxTlDelay])).sort((a, b) => a - b);
     const tlGridHtml = tlGridTicks.map(tick => {
       const y = getTlY(tick);
       return `
@@ -477,15 +481,20 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
   const scW = scatterWidth - scPaddingL - scPaddingR;
   const scH = scatterHeight - scPaddingT - scPaddingB;
 
-  const maxScatterDelay = Math.max(...filteredRecords.map(r => getRecordDelay(r, baselines)).map(Math.abs), 10);
+  const scatterDelays = filteredRecords.map(r => getRecordDelay(r, baselines));
+  let maxScatterDelay = Math.max(...scatterDelays, 10);
+  let minScatterDelay = Math.min(...scatterDelays, -5);
+  if (minScatterDelay > 0) minScatterDelay = 0;
   
-  const getScY = (d: number) => scPaddingT + ((maxScatterDelay - d) * scH) / maxScatterDelay;
+  const rangeSc = maxScatterDelay - minScatterDelay || 1;
+  
+  const getScY = (d: number) => scPaddingT + ((maxScatterDelay - d) / rangeSc) * scH;
   const getScX = (timeStr: string) => {
     const mins = timeToMinutes(timeStr);
     return scPaddingL + (mins / 1440) * scW; // 1440 min = 24h
   };
 
-  const scGridTicksY = [0, maxScatterDelay * 0.5, maxScatterDelay];
+  const scGridTicksY = Array.from(new Set([minScatterDelay, 0, maxScatterDelay])).sort((a, b) => a - b);
   const scGridHtmlY = scGridTicksY.map(tick => {
     const y = getScY(tick);
     return `
@@ -508,13 +517,13 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
   const scatterDotsHtml = filteredRecords.map(r => {
     const delay = getRecordDelay(r, baselines);
     const x = getScX(r.scheduledDeparture);
-    const y = getScY(Math.max(0, delay)); // plota apenas atrasos positivos pra evitar quebra
+    const y = getScY(delay); // Agora plota atrasos negativos também
     
     let color = 'var(--success)';
     if (delay > 8) color = 'var(--danger)';
     else if (delay > 4) color = 'var(--warning)';
 
-    const tooltip = `Dia ${formatDate(r.date)} (${r.scheduledDeparture}): +${delay} min`;
+    const tooltip = `Dia ${formatDate(r.date)} (${r.scheduledDeparture}): ${delay >= 0 ? '+' : ''}${delay} min`;
     return `
       <circle cx="${x}" cy="${y}" r="4" fill="${color}" opacity="0.7" class="scatter-dot">
         <title>${tooltip}</title>

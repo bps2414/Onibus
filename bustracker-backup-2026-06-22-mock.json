@@ -1,0 +1,2336 @@
+{
+  "busLines": [
+    {
+      "id": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "name": "Fagundes x Casa",
+      "number": "701",
+      "color": "#6366f1"
+    },
+    {
+      "id": "33de0618-cfe8-4196-9f88-a546ab6b270c",
+      "name": "Fagundes x Centro",
+      "number": "701",
+      "color": "#6366f1"
+    },
+    {
+      "id": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "name": "Itaboraí x Curuzu",
+      "number": "70",
+      "color": "#fe9044"
+    },
+    {
+      "id": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "name": "Curuzu x Itaboraí",
+      "number": "70",
+      "color": "#ff8800"
+    }
+  ],
+  "busStops": [
+    {
+      "id": "741ddbe0-3bc7-40c0-b68c-6727ba1e95e6",
+      "name": "Centro"
+    },
+    {
+      "id": "b8ff0ebb-8356-4824-af86-63b47dba6795",
+      "name": "Casa"
+    }
+  ],
+  "schedules": [
+    {
+      "id": "0128878e-a81e-411a-8c5c-5412c74381cc",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "07:00"
+    },
+    {
+      "id": "013a5851-060d-4cdd-9031-9a72901cad12",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "17:00"
+    },
+    {
+      "id": "06087ca7-8c3a-4dcd-ac1e-c5eae59fce94",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "19:00"
+    },
+    {
+      "id": "06cad8b8-1c30-43f6-bc4f-0ada43c1a144",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "22:00"
+    },
+    {
+      "id": "0788336c-f09c-4c15-839c-c6782ed7f883",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "08:20"
+    },
+    {
+      "id": "07942032-af94-4227-8d73-a9ba061310a9",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "06:40"
+    },
+    {
+      "id": "0823bc4b-b699-4008-8b11-94fae45876c8",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "07:40"
+    },
+    {
+      "id": "0bfb857a-bb20-4b53-831c-a4c912db4250",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "12:40"
+    },
+    {
+      "id": "0de37484-b133-4aac-aa7d-3472377ca4ba",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "21:20"
+    },
+    {
+      "id": "13606e00-a5e0-4443-8999-7b0fe89786d0",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "20:40"
+    },
+    {
+      "id": "15c0a561-c6a1-4ba7-91d5-6df24cea20a8",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "15:40"
+    },
+    {
+      "id": "186dcdf8-93f1-4207-9591-fa668dc0f14e",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "20:20"
+    },
+    {
+      "id": "1d3cbc46-20cd-482b-af34-a682549ea59b",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "13:20"
+    },
+    {
+      "id": "1df1f1d1-62bd-47e7-933b-ae565662db04",
+      "lineId": "33de0618-cfe8-4196-9f88-a546ab6b270c",
+      "dayType": "weekday",
+      "departureTime": "20:45"
+    },
+    {
+      "id": "25fe49ca-a84c-4a8c-8ebc-ac66c9833276",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "08:00"
+    },
+    {
+      "id": "29d1993b-0473-4025-834c-b3871b63bb60",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "11:40"
+    },
+    {
+      "id": "2cc55fb2-1587-48a8-96fd-5f65d12cc866",
+      "lineId": "33de0618-cfe8-4196-9f88-a546ab6b270c",
+      "dayType": "weekday",
+      "departureTime": "05:50"
+    },
+    {
+      "id": "37bc515f-7dbb-4bed-a18e-2ff8155afd7a",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "11:20"
+    },
+    {
+      "id": "3a08658a-242b-4635-b881-45e7486e0d5d",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "09:40"
+    },
+    {
+      "id": "3c967c5c-06b5-4fed-b3f0-7805d12f28f6",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "04:10"
+    },
+    {
+      "id": "41d4959c-afc2-48ee-9e54-6da29b4aeed1",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "20:00"
+    },
+    {
+      "id": "464fd2a1-4e23-449b-a6c7-766e7094913f",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "11:00"
+    },
+    {
+      "id": "477b8831-d94b-44da-a4fc-99d5b363153f",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "23:20"
+    },
+    {
+      "id": "47a9af9d-c847-46f8-836f-3b5f7e53aaa8",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "16:40"
+    },
+    {
+      "id": "4a141683-e439-4f19-b0d1-ca8579eda95b",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "06:00"
+    },
+    {
+      "id": "59291b87-495a-407c-b429-d1c6da5ec314",
+      "lineId": "33de0618-cfe8-4196-9f88-a546ab6b270c",
+      "dayType": "weekday",
+      "departureTime": "08:00"
+    },
+    {
+      "id": "5c5e6793-ae72-4a10-8975-530150148d14",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "10:00"
+    },
+    {
+      "id": "5fa10632-6141-4275-af30-524d83357377",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "14:00"
+    },
+    {
+      "id": "601664e8-fb03-421a-9630-8c781fffca6f",
+      "lineId": "33de0618-cfe8-4196-9f88-a546ab6b270c",
+      "dayType": "weekday",
+      "departureTime": "11:30"
+    },
+    {
+      "id": "61e63a8b-ff93-4a41-bfe4-84cbe7e5dc5c",
+      "lineId": "33de0618-cfe8-4196-9f88-a546ab6b270c",
+      "dayType": "weekday",
+      "departureTime": "15:45"
+    },
+    {
+      "id": "643db803-e859-4b5f-9622-025d5de99c25",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "17:20"
+    },
+    {
+      "id": "64985608-a20d-4454-8bb1-17028d3f0700",
+      "lineId": "33de0618-cfe8-4196-9f88-a546ab6b270c",
+      "dayType": "weekday",
+      "departureTime": "17:25"
+    },
+    {
+      "id": "68dbc0d3-8f37-4429-8d0d-843de2c0d3b3",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "10:20"
+    },
+    {
+      "id": "6b1492ab-55fc-443a-a37a-6879de937cf6",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "05:00"
+    },
+    {
+      "id": "722cb42d-3aee-45bc-92d6-9da72a0bf1f2",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "18:40"
+    },
+    {
+      "id": "7760de19-7bc2-4d9a-a807-2a22f7344965",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "14:20"
+    },
+    {
+      "id": "77c5257a-774b-4912-9777-f6916adf5c79",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "weekday",
+      "departureTime": "09:17"
+    },
+    {
+      "id": "78ed7b6f-db38-4637-b9b3-37474225be1e",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "22:00"
+    },
+    {
+      "id": "7c25e4f0-9d69-40f9-95a5-50ca43bce3a9",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "14:40"
+    },
+    {
+      "id": "7e2c48fe-1715-437e-ad90-c39b5e026cde",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "15:20"
+    },
+    {
+      "id": "7e683398-ea85-4b31-8692-8f1ce0792828",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "weekday",
+      "departureTime": "18:11"
+    },
+    {
+      "id": "8372ff51-644e-46b7-9db4-eb9b11d9695d",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "05:00"
+    },
+    {
+      "id": "83fb8261-a0ee-4027-b345-b3f6e8ff4ea6",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "weekday",
+      "departureTime": "19:59"
+    },
+    {
+      "id": "87cd17cf-05dc-4bcf-93bf-f806ce09d947",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "19:40"
+    },
+    {
+      "id": "8a04a0ec-0c10-43cb-b50a-606b54504481",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "18:00"
+    },
+    {
+      "id": "8d2869f2-9f4c-4693-b1ae-7a624501b892",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "13:40"
+    },
+    {
+      "id": "9041dbd4-a44c-42f6-b688-5c10d559d36c",
+      "lineId": "33de0618-cfe8-4196-9f88-a546ab6b270c",
+      "dayType": "weekday",
+      "departureTime": "08:30"
+    },
+    {
+      "id": "910422ac-8da6-47c4-be06-6ed88c95bcca",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "22:40"
+    },
+    {
+      "id": "97a32ba9-3a32-40ce-8500-4075d50ca6a4",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "weekday",
+      "departureTime": "06:57"
+    },
+    {
+      "id": "99e2ae1c-394b-41bb-a151-75967c6a20ea",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "09:00"
+    },
+    {
+      "id": "9a9d98f6-1dd8-49ec-8610-5e238087d6a9",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "07:20"
+    },
+    {
+      "id": "a47acda5-3a33-4d4e-8382-04296868244d",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "12:00"
+    },
+    {
+      "id": "a8f527e8-5e92-47d3-b777-627d06f5f90f",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "08:40"
+    },
+    {
+      "id": "a9308ed1-faf7-403b-9869-f028fc91b584",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "19:20"
+    },
+    {
+      "id": "b472d9c6-4813-470b-8bec-fc69a51f6053",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "16:20"
+    },
+    {
+      "id": "b700111b-a192-40d8-b252-f8aa4e38e67b",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "13:00"
+    },
+    {
+      "id": "b86811f2-a72b-4ca9-bf11-b49e05b51bc4",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "17:40"
+    },
+    {
+      "id": "c20beef3-07fd-4c80-9211-b6b315ff5647",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "10:40"
+    },
+    {
+      "id": "c418c1ce-a56d-4059-a2be-c0385c551504",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "weekday",
+      "departureTime": "16:35"
+    },
+    {
+      "id": "d1ddf42e-8e94-495b-9a72-feab51961f7e",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "weekday",
+      "departureTime": "16:00"
+    },
+    {
+      "id": "d3238610-d8f5-4718-83fd-0b6137b8e8d6",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "21:00"
+    },
+    {
+      "id": "d6259b21-8735-4029-bc0c-393d0c6dbc0b",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "16:00"
+    },
+    {
+      "id": "d782ed6e-9a4e-4dc8-a3f2-0156c1a8c377",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "09:20"
+    },
+    {
+      "id": "dabf3d8d-0f1e-4bad-b140-012016154b71",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "weekday",
+      "departureTime": "12:16"
+    },
+    {
+      "id": "dbf2649c-d032-4acc-8420-77a1cdd958f4",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "12:20"
+    },
+    {
+      "id": "dcbd302e-bbfb-47cc-a402-4269fff5152f",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "18:20"
+    },
+    {
+      "id": "dee9d2b2-9f2d-4fd0-bfbb-2a91ee68cc52",
+      "lineId": "33de0618-cfe8-4196-9f88-a546ab6b270c",
+      "dayType": "weekday",
+      "departureTime": "19:19"
+    },
+    {
+      "id": "e39a49bf-166b-4816-9943-c82123109a8c",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "weekday",
+      "departureTime": "22:40"
+    },
+    {
+      "id": "e72e96c5-b3d7-4a9e-87c0-3bb287b615f5",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "weekday",
+      "departureTime": "05:00"
+    },
+    {
+      "id": "e8fa1393-274d-4654-a513-001c0edecab3",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "21:40"
+    },
+    {
+      "id": "f8f730ea-33a6-4d15-8cf5-a08e7d5d1d90",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "15:00"
+    },
+    {
+      "id": "fd86f9f1-d7a4-4d2d-a81b-62d23197dcbc",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "weekday",
+      "departureTime": "06:00"
+    },
+    {
+      "id": "4bb26e3b-7b8c-46f2-a58d-ef1b8c598b82",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "05:00"
+    },
+    {
+      "id": "61929026-ceb0-4204-b651-cf82c9146932",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "06:00"
+    },
+    {
+      "id": "02b51e09-128e-4254-a2a7-9ca12caaa2e8",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "07:00"
+    },
+    {
+      "id": "f8512973-d81e-430a-bf52-24ab315f2182",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "07:40"
+    },
+    {
+      "id": "d646a6e2-47de-4438-b9ef-b93f379e2c52",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "08:20"
+    },
+    {
+      "id": "b19a240e-0e7a-4ad1-b2e6-07be8a8d4df3",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "09:00"
+    },
+    {
+      "id": "80cccedd-112e-4655-9e28-7161dd95a366",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "09:40"
+    },
+    {
+      "id": "4311ce29-c5f7-47fd-8118-caf9d56965dd",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "10:20"
+    },
+    {
+      "id": "9bf33a1c-e5ea-426c-8898-5dce4331e634",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "11:00"
+    },
+    {
+      "id": "8621d0de-50c4-44f1-ac7d-1d55c92fc544",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "11:40"
+    },
+    {
+      "id": "2701c72e-232a-4de5-b491-050f93cf170f",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "12:20"
+    },
+    {
+      "id": "faf7c6c5-56fd-49a8-a604-e9af0fb4564f",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "13:00"
+    },
+    {
+      "id": "a27443f4-0737-4a98-bb74-8d416a1b6bdd",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "13:40"
+    },
+    {
+      "id": "2e6a259e-3921-4c5a-a0aa-7b69c31b1460",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "14:20"
+    },
+    {
+      "id": "4ea43c2c-aa1c-4dd5-b66d-69476e177b07",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "15:00"
+    },
+    {
+      "id": "e5658d0e-7611-487f-a5a0-6a22b0e32b82",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "15:40"
+    },
+    {
+      "id": "195a0859-05e9-4263-926f-bffb57dc774a",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "16:20"
+    },
+    {
+      "id": "c363b593-498d-4748-a18e-beb440d3e51d",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "17:00"
+    },
+    {
+      "id": "85333f65-0fa4-40d4-9ff9-c66e7392ae48",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "17:40"
+    },
+    {
+      "id": "208f1951-5e44-4982-b359-88779b30fc40",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "18:20"
+    },
+    {
+      "id": "53b35ba4-42c1-48a6-8ca7-10305434d672",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "19:00"
+    },
+    {
+      "id": "05bc9ff5-4e3d-4bff-97dd-f8ceec065615",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "19:40"
+    },
+    {
+      "id": "4fc1111f-fd7f-44e8-b1ce-bb84bdc6be02",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "20:20"
+    },
+    {
+      "id": "2cdc3244-231f-463e-9fa7-96961e21f67c",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "21:00"
+    },
+    {
+      "id": "de915e10-6d35-422b-90ff-a5bcc0e8fce6",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "21:40"
+    },
+    {
+      "id": "8b29a45b-e907-4ce6-9801-e7abc93ea67c",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "22:00"
+    },
+    {
+      "id": "e3bdac9e-4f18-42ba-9ba6-129a507d6ccb",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "22:40"
+    },
+    {
+      "id": "1641a4e5-a654-407f-8897-76e8b082312a",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "dayType": "saturday",
+      "departureTime": "23:20"
+    },
+    {
+      "id": "14dfcd16-c279-4b81-b7f1-19f070e91ed7",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "04:10"
+    },
+    {
+      "id": "315f93e7-b1a9-4db4-aaca-081a038dd12c",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "05:00"
+    },
+    {
+      "id": "6e0662db-07bd-4964-a7f4-160c512b0e38",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "06:00"
+    },
+    {
+      "id": "fedfeca5-3d4b-4445-9f7c-c19c577ea466",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "06:40"
+    },
+    {
+      "id": "15f706bb-61ac-45fd-b272-5b2bf6c59211",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "07:20"
+    },
+    {
+      "id": "15270909-f014-47bc-b520-4e572fc7a5c1",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "08:00"
+    },
+    {
+      "id": "32159caa-3d4a-44ce-a44b-a05fde4b0813",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "08:40"
+    },
+    {
+      "id": "8e5c7886-fd0e-49bd-9bd7-2a1361162a36",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "09:20"
+    },
+    {
+      "id": "5ac4c883-a83e-44a9-8ea5-c98d50164a9d",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "10:00"
+    },
+    {
+      "id": "75e09cd3-92f1-4fad-9a28-f6b8b129062f",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "10:40"
+    },
+    {
+      "id": "5936f44e-6258-4f92-9bba-dcec098ad443",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "11:20"
+    },
+    {
+      "id": "a6415b3e-8c53-4292-8874-ffda43a153f2",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "12:00"
+    },
+    {
+      "id": "293546c1-00e1-455b-8737-02cd02fa1c5d",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "12:40"
+    },
+    {
+      "id": "68a0fdb2-8cd6-477d-a505-46c102967967",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "13:20"
+    },
+    {
+      "id": "4ce6705e-6b93-442d-bd2b-a91032f9adc0",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "14:00"
+    },
+    {
+      "id": "fdc21e59-164d-4268-8796-adb2c5ed0176",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "14:40"
+    },
+    {
+      "id": "d41d5df2-2b12-43fc-b251-42fe82732df8",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "15:20"
+    },
+    {
+      "id": "f29e6061-8615-49c5-8caa-e102e23dfe4f",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "16:00"
+    },
+    {
+      "id": "99c2709e-59d0-4f44-a713-6c1f4e19d066",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "16:40"
+    },
+    {
+      "id": "e13762de-416c-4982-a6d1-b58c173be5a5",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "17:20"
+    },
+    {
+      "id": "91f6f2a5-47d1-4fe0-bbc2-4ba136e922ef",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "18:00"
+    },
+    {
+      "id": "ddca48e1-8b25-4298-b790-53778ff5213c",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "18:40"
+    },
+    {
+      "id": "3ee20d40-b451-4635-94e9-dd9ec3c89c28",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "19:20"
+    },
+    {
+      "id": "4e7f55f6-5506-4a1c-bff3-b87b4dc6c579",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "20:00"
+    },
+    {
+      "id": "58cbe6f5-a6e1-441c-af99-d766fe63ace5",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "20:40"
+    },
+    {
+      "id": "de37c8ad-e59e-46b7-8c2e-4a04c6bac759",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "21:20"
+    },
+    {
+      "id": "4eebde94-8361-4d68-bb9c-c59a689414b5",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "22:00"
+    },
+    {
+      "id": "22b571e1-07de-4b76-a169-a7b8fc0e78be",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "dayType": "saturday",
+      "departureTime": "22:40"
+    },
+    {
+      "id": "01ac9cc6-5ced-4a4e-8882-127d543462db",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "saturday",
+      "departureTime": "05:50"
+    },
+    {
+      "id": "0884a431-9e2f-4ff3-b2a0-e770c8005fb1",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "saturday",
+      "departureTime": "08:00"
+    },
+    {
+      "id": "bc09c5c8-977e-47c4-8e1b-21866b705ede",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "saturday",
+      "departureTime": "08:30"
+    },
+    {
+      "id": "4fc7e88c-8ab3-4c15-932a-fd725f2563f2",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "saturday",
+      "departureTime": "11:30"
+    },
+    {
+      "id": "de9363e7-fc65-449b-8e7b-96d1c938386b",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "saturday",
+      "departureTime": "15:45"
+    },
+    {
+      "id": "5748adb8-90f8-4ff0-939c-e97c06143b8e",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "saturday",
+      "departureTime": "17:25"
+    },
+    {
+      "id": "5fcd60bd-e3fc-458a-9c9b-1bcd22bdbf34",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "saturday",
+      "departureTime": "19:19"
+    },
+    {
+      "id": "d9e3bcc4-d385-4f61-9b82-8486a7bebf7c",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "dayType": "saturday",
+      "departureTime": "20:45"
+    }
+  ],
+  "presets": [
+    {
+      "id": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "name": "Ir pra casa (Laranjinha)",
+      "icon": "🏠",
+      "lineId": "4e19c0fa-c70a-477e-8c5e-2578314d4cbb",
+      "boardingStopId": "741ddbe0-3bc7-40c0-b68c-6727ba1e95e6",
+      "destinationStopId": "b8ff0ebb-8356-4824-af86-63b47dba6795",
+      "estimatedBoardingOffset": 2,
+      "estimatedTripDuration": 22
+    },
+    {
+      "id": "2b077c4a-8516-44e3-b9cb-cce58ebd3ea7",
+      "name": "Ir pra escola 8 horas",
+      "icon": "🏫",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "boardingStopId": "b8ff0ebb-8356-4824-af86-63b47dba6795",
+      "destinationStopId": "741ddbe0-3bc7-40c0-b68c-6727ba1e95e6",
+      "estimatedBoardingOffset": 30,
+      "estimatedTripDuration": 20
+    },
+    {
+      "id": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "name": "Ir pro Centro/Escola",
+      "icon": "🎓",
+      "lineId": "be14dbc7-89d3-4a6e-936c-5eebe89d76af",
+      "boardingStopId": "b8ff0ebb-8356-4824-af86-63b47dba6795",
+      "destinationStopId": "741ddbe0-3bc7-40c0-b68c-6727ba1e95e6",
+      "estimatedBoardingOffset": 30,
+      "estimatedTripDuration": 25
+    },
+    {
+      "id": "f7c1e9af-8b87-4977-9733-cf6974b68e64",
+      "name": "Ir pra casa",
+      "icon": "🏠",
+      "lineId": "1ddec25f-41d8-49c6-b4fa-a2ce1d82fb19",
+      "boardingStopId": "741ddbe0-3bc7-40c0-b68c-6727ba1e95e6",
+      "destinationStopId": "b8ff0ebb-8356-4824-af86-63b47dba6795",
+      "estimatedBoardingOffset": 10,
+      "estimatedTripDuration": 20
+    }
+  ],
+  "tripRecords": [
+    {
+      "id": "ec6c44c0-71ef-4c0d-b085-83c3bf23c49b",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-03-24",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:34",
+      "arrivedAtDestination": "08:02"
+    },
+    {
+      "id": "ba409964-c209-4fec-be59-866320b13117",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-03-24",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:24",
+      "arrivedAtDestination": "17:46"
+    },
+    {
+      "id": "e3d11ea2-813a-4ce5-bc9d-b2b2c93cebdd",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-03-25",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:28",
+      "arrivedAtDestination": "07:56"
+    },
+    {
+      "id": "a4b9ef15-78ac-41cd-80b2-628d1738255b",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-03-25",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:23",
+      "arrivedAtDestination": "17:48"
+    },
+    {
+      "id": "85e67722-cf33-4560-9a25-9e732f2119af",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-03-26",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:31",
+      "arrivedAtDestination": "07:55"
+    },
+    {
+      "id": "363b3144-4bd3-4d41-a1fb-72076af02646",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-03-26",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:22",
+      "arrivedAtDestination": "17:42"
+    },
+    {
+      "id": "1561d339-b806-479a-bf81-dc9860d36616",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-03-27",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:25",
+      "arrivedAtDestination": "07:54"
+    },
+    {
+      "id": "295eee42-ec57-48ba-b7f6-e7285e95e3a4",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-03-27",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:33",
+      "arrivedAtDestination": "17:59"
+    },
+    {
+      "id": "270171fc-48ff-455a-94ab-dd8d92df6066",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-03-28",
+      "dayOfWeek": 6,
+      "dayType": "saturday",
+      "scheduledDeparture": "09:00",
+      "busArrivedAt": "09:33",
+      "arrivedAtDestination": "09:58"
+    },
+    {
+      "id": "059b3a19-c62d-48ca-9e8a-a79298268b17",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-03-30",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:31",
+      "arrivedAtDestination": "07:57"
+    },
+    {
+      "id": "ee4cb5f3-6885-49d0-bb8a-67d1de08fcca",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-03-30",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:22",
+      "arrivedAtDestination": "17:43"
+    },
+    {
+      "id": "9ad98f12-a1d3-43be-b4f3-907f884b05ab",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-03-31",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:28",
+      "arrivedAtDestination": "07:53"
+    },
+    {
+      "id": "f818e737-a107-42d5-931b-75afde2155bd",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-03-31",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:20",
+      "arrivedAtDestination": "17:45"
+    },
+    {
+      "id": "75ace38e-adf1-4d81-b896-7d4b9c095610",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-01",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:30",
+      "arrivedAtDestination": "07:56"
+    },
+    {
+      "id": "a96a1af0-4e59-4864-8fe8-c32dc129b4f3",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-01",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:25",
+      "arrivedAtDestination": "17:46"
+    },
+    {
+      "id": "5475546b-7a25-41e0-8efe-a0ff8014bb56",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-02",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:32",
+      "arrivedAtDestination": "07:52"
+    },
+    {
+      "id": "0a02fc51-e9a3-44f5-8a8d-828aaffa8204",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-02",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:20",
+      "arrivedAtDestination": "17:38"
+    },
+    {
+      "id": "cc659c32-95f7-4556-bfbe-a57e7239691e",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-03",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:26",
+      "arrivedAtDestination": "07:51"
+    },
+    {
+      "id": "b895c20a-fc17-4882-89ce-5dd5ad20b0f4",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-03",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:34",
+      "arrivedAtDestination": "17:55"
+    },
+    {
+      "id": "e35708e0-c739-4157-b5cb-910ea8fbcaf3",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-04",
+      "dayOfWeek": 6,
+      "dayType": "saturday",
+      "scheduledDeparture": "09:00",
+      "busArrivedAt": "09:29",
+      "arrivedAtDestination": "09:54"
+    },
+    {
+      "id": "4cdc18bf-6dfa-4b2b-a92f-cba502d01a36",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-06",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:30",
+      "arrivedAtDestination": "07:52"
+    },
+    {
+      "id": "dfc14ad5-90e9-4538-9e0c-60cad3baa741",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-06",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:21",
+      "arrivedAtDestination": "17:39"
+    },
+    {
+      "id": "86ebaca7-3ef5-49a4-accd-e86252bfe8d4",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-07",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:33",
+      "arrivedAtDestination": "07:55"
+    },
+    {
+      "id": "277477aa-1865-4c78-a2cd-032dc34c4494",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-07",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:20",
+      "arrivedAtDestination": "17:38"
+    },
+    {
+      "id": "63449b0f-f96b-47ff-8e24-3c59012d654b",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-08",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:29",
+      "arrivedAtDestination": "07:50"
+    },
+    {
+      "id": "f2708f32-a991-473b-a4ec-ec1a5250c87a",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-08",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:22",
+      "arrivedAtDestination": "17:46"
+    },
+    {
+      "id": "9cbeaa7f-ac58-4537-be69-5a27a01e5c1d",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-09",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:33",
+      "arrivedAtDestination": "07:55"
+    },
+    {
+      "id": "01759b4c-1333-4c07-8ae0-8e18a09b18f7",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-09",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:22",
+      "arrivedAtDestination": "17:43"
+    },
+    {
+      "id": "6fea578a-03ff-4a58-82ad-e0aeb6e48d0b",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-10",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:34",
+      "arrivedAtDestination": "07:58"
+    },
+    {
+      "id": "cfedf30a-13d6-4bcc-9063-cea59c494e9e",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-10",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:32",
+      "arrivedAtDestination": "17:56"
+    },
+    {
+      "id": "585ac93a-9e87-4a24-bf0f-f019db3f8fd2",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-11",
+      "dayOfWeek": 6,
+      "dayType": "saturday",
+      "scheduledDeparture": "09:00",
+      "busArrivedAt": "09:30",
+      "arrivedAtDestination": "09:54"
+    },
+    {
+      "id": "0a955fee-342e-40d9-9302-f69f5dcff276",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-13",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:35",
+      "arrivedAtDestination": "08:04"
+    },
+    {
+      "id": "21ad6e54-3114-473f-9f80-7d89d9977587",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-13",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:20",
+      "arrivedAtDestination": "17:44"
+    },
+    {
+      "id": "cd816a84-36ef-47fe-86be-19bce9e944c8",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-14",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:28",
+      "arrivedAtDestination": "07:55"
+    },
+    {
+      "id": "46b51dd2-4cfb-4747-b534-eea834596626",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-14",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:24",
+      "arrivedAtDestination": "17:44"
+    },
+    {
+      "id": "5fbe1f0a-3634-4e76-b422-8668271b9da2",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-15",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:27",
+      "arrivedAtDestination": "07:52"
+    },
+    {
+      "id": "74ecfeaa-eda6-4adb-bc30-1bdf34520af6",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-15",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:23",
+      "arrivedAtDestination": "17:46"
+    },
+    {
+      "id": "dfbf2975-03c4-4776-9cc3-f1303be584d3",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-16",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:35",
+      "arrivedAtDestination": "08:05"
+    },
+    {
+      "id": "f2c326cc-4c9f-43f5-ac81-40cec1e2153c",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-16",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:22",
+      "arrivedAtDestination": "17:46"
+    },
+    {
+      "id": "2235fb96-cb48-49fd-ab60-20f32a344384",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-17",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:32",
+      "arrivedAtDestination": "07:59"
+    },
+    {
+      "id": "703c335f-e32d-4587-a199-a01ac2e25bcd",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-17",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:32",
+      "arrivedAtDestination": "17:54"
+    },
+    {
+      "id": "de66fd45-7b92-49e4-b3a4-aea4585c4426",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-18",
+      "dayOfWeek": 6,
+      "dayType": "saturday",
+      "scheduledDeparture": "09:00",
+      "busArrivedAt": "09:32",
+      "arrivedAtDestination": "09:54"
+    },
+    {
+      "id": "d862a8d6-8f23-4a19-9abf-e0a4f6926764",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-20",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:33",
+      "arrivedAtDestination": "07:56"
+    },
+    {
+      "id": "02bcd84e-124b-4691-9081-96b3c281d380",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-20",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:23",
+      "arrivedAtDestination": "17:46"
+    },
+    {
+      "id": "ef5d5b37-3d83-48ad-afa6-c7e455afc949",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-21",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:28",
+      "arrivedAtDestination": "07:53"
+    },
+    {
+      "id": "4699ad92-14be-4f24-b181-cbf29b0ae0a9",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-21",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:23",
+      "arrivedAtDestination": "17:48"
+    },
+    {
+      "id": "e99da047-e61c-445b-9ec0-827c1437c147",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-22",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:34",
+      "arrivedAtDestination": "08:01"
+    },
+    {
+      "id": "0a064257-0cf6-4fa5-aa5e-1eaff6c27a07",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-22",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:22",
+      "arrivedAtDestination": "17:44"
+    },
+    {
+      "id": "203ed9d9-5eca-4322-9d6d-65f9104e184c",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-23",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:28",
+      "arrivedAtDestination": "07:55"
+    },
+    {
+      "id": "004ca956-6ff9-43bf-b0ab-18c375b3414f",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-23",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:23",
+      "arrivedAtDestination": "17:46"
+    },
+    {
+      "id": "cada1c55-644a-463c-805d-0d9be40c1d61",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-24",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:33",
+      "arrivedAtDestination": "07:55"
+    },
+    {
+      "id": "7deeaf95-15d9-4d94-940a-a62c5d5b3242",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-24",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:30",
+      "arrivedAtDestination": "17:55"
+    },
+    {
+      "id": "0e75195f-9923-4979-a763-ee13a4686255",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-25",
+      "dayOfWeek": 6,
+      "dayType": "saturday",
+      "scheduledDeparture": "09:00",
+      "busArrivedAt": "09:32",
+      "arrivedAtDestination": "09:58"
+    },
+    {
+      "id": "4b8c70d0-1e5e-40d3-bb4c-b997154b7c2f",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-27",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:39",
+      "arrivedAtDestination": "08:04"
+    },
+    {
+      "id": "c488f62b-fdb9-4601-ad3b-688f4e2de918",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-27",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:21",
+      "arrivedAtDestination": "17:40"
+    },
+    {
+      "id": "3e755155-17d7-4d0a-8ade-c465ed3541d3",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-28",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:27",
+      "arrivedAtDestination": "07:48"
+    },
+    {
+      "id": "954fd280-3158-423c-93b6-430ceaa022db",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-28",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:20",
+      "arrivedAtDestination": "17:42"
+    },
+    {
+      "id": "c03f0a26-b392-4a85-bc8e-0a178b72067c",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-29",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:26",
+      "arrivedAtDestination": "07:49"
+    },
+    {
+      "id": "f6a0986b-3604-4342-8d8e-89fac8a78f3b",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-29",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:25",
+      "arrivedAtDestination": "17:47"
+    },
+    {
+      "id": "2b1c56c0-2b70-49a1-8447-e2cee066bd22",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-04-30",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:31",
+      "arrivedAtDestination": "07:59"
+    },
+    {
+      "id": "76b56433-900c-4132-befd-8e2bf23782b3",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-04-30",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:21",
+      "arrivedAtDestination": "17:40"
+    },
+    {
+      "id": "9df92717-8cfb-42e2-8973-59d134133c8c",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-01",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:33",
+      "arrivedAtDestination": "07:57"
+    },
+    {
+      "id": "8fe57ca7-e4b9-48b3-a5c5-3fc7f6e81509",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-01",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:33",
+      "arrivedAtDestination": "17:57"
+    },
+    {
+      "id": "aa9ec292-29bc-447f-99bb-26f97df90fc6",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-02",
+      "dayOfWeek": 6,
+      "dayType": "saturday",
+      "scheduledDeparture": "09:00",
+      "busArrivedAt": "09:29",
+      "arrivedAtDestination": "09:53"
+    },
+    {
+      "id": "20fbd380-055a-4d18-85ca-38f50469bba8",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-04",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:30",
+      "arrivedAtDestination": "07:51"
+    },
+    {
+      "id": "713c8ee2-00a9-44c8-996d-0d43c53e490d",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-04",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:25",
+      "arrivedAtDestination": "17:47"
+    },
+    {
+      "id": "3fc7d150-b953-48a7-a12b-fab84cfb9b89",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-05",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:30",
+      "arrivedAtDestination": "07:58"
+    },
+    {
+      "id": "8cd21de8-6bbf-4080-a205-24c510353ab4",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-05",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:20",
+      "arrivedAtDestination": "17:41"
+    },
+    {
+      "id": "228236e1-9f9a-417b-ab98-717f270a3302",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-06",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:32",
+      "arrivedAtDestination": "08:01"
+    },
+    {
+      "id": "221294aa-e25b-48c8-a3bf-47cebd5a484b",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-06",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:24",
+      "arrivedAtDestination": "17:49"
+    },
+    {
+      "id": "4b4f6268-ecbf-4a0c-ad33-83e73bd9d91e",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-07",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:35",
+      "arrivedAtDestination": "07:58"
+    },
+    {
+      "id": "8d773dd1-d5c1-4597-a48e-893eb7047097",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-07",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:22",
+      "arrivedAtDestination": "17:46"
+    },
+    {
+      "id": "be728be2-2f50-451b-b8f1-388a14dcef81",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-08",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:34",
+      "arrivedAtDestination": "07:59"
+    },
+    {
+      "id": "8ed400a9-4ba2-4274-9018-b89f787cce61",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-08",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:31",
+      "arrivedAtDestination": "17:53"
+    },
+    {
+      "id": "3c8d9655-9ffc-406c-8294-ec7d6777b230",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-09",
+      "dayOfWeek": 6,
+      "dayType": "saturday",
+      "scheduledDeparture": "09:00",
+      "busArrivedAt": "09:34",
+      "arrivedAtDestination": "10:01"
+    },
+    {
+      "id": "90058bcd-2423-4cc6-8143-ea3ad99aeaed",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-11",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:30",
+      "arrivedAtDestination": "07:52"
+    },
+    {
+      "id": "290557cb-fc86-4e9f-8a24-68defb27c2b6",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-11",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:23",
+      "arrivedAtDestination": "17:45"
+    },
+    {
+      "id": "ed75596a-dd12-485e-9b84-9efeb7106381",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-12",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:26",
+      "arrivedAtDestination": "07:49"
+    },
+    {
+      "id": "f773c284-7a37-438e-8f0a-552cade85efa",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-12",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:23",
+      "arrivedAtDestination": "17:48"
+    },
+    {
+      "id": "ff7ef1c2-6cef-496a-9d64-b4db71b1761b",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-13",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:31",
+      "arrivedAtDestination": "07:53"
+    },
+    {
+      "id": "c545a75f-5f61-4ccc-b6b5-1b49476020fb",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-13",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:21",
+      "arrivedAtDestination": "17:39"
+    },
+    {
+      "id": "4b461ad9-07f3-4dd4-94a7-d011608f2157",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-14",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:34",
+      "arrivedAtDestination": "07:59"
+    },
+    {
+      "id": "ca42581a-0a5e-49b3-885b-552e84c7bb00",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-14",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:23",
+      "arrivedAtDestination": "17:44"
+    },
+    {
+      "id": "45c43fbe-fabe-4805-a154-c4809b89af54",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-15",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:26",
+      "arrivedAtDestination": "07:52"
+    },
+    {
+      "id": "1db82269-e71d-4040-b8fe-23259bb2590f",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-15",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:32",
+      "arrivedAtDestination": "17:55"
+    },
+    {
+      "id": "d0f5505b-437d-4850-a547-5c4192bca08f",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-16",
+      "dayOfWeek": 6,
+      "dayType": "saturday",
+      "scheduledDeparture": "09:00",
+      "busArrivedAt": "09:34",
+      "arrivedAtDestination": "09:57"
+    },
+    {
+      "id": "a84e3c79-cdc9-4d2d-aec1-06be60745334",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-18",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:38",
+      "arrivedAtDestination": "08:04"
+    },
+    {
+      "id": "b799e8b7-1300-4505-be72-a65379779815",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-18",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:21",
+      "arrivedAtDestination": "17:42"
+    },
+    {
+      "id": "3638f491-e7d8-4ecd-9ff2-d57b6dfd0b20",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-19",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:29",
+      "arrivedAtDestination": "07:51"
+    },
+    {
+      "id": "6746c2ea-ff42-4203-8118-d4c24d951f16",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-19",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:24",
+      "arrivedAtDestination": "17:50"
+    },
+    {
+      "id": "3e5ff93c-bbd9-4030-be1a-166efc0b823b",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-20",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:33",
+      "arrivedAtDestination": "07:58"
+    },
+    {
+      "id": "074b635e-103e-4100-91f4-69aeee751c39",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-20",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:24",
+      "arrivedAtDestination": "17:44"
+    },
+    {
+      "id": "c5c9f935-ba0e-4ba9-bb7f-34e9dacca610",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-21",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:27",
+      "arrivedAtDestination": "07:48"
+    },
+    {
+      "id": "c8388e53-4944-4ec6-907a-cb5eb50e4da0",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-21",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:23",
+      "arrivedAtDestination": "17:45"
+    },
+    {
+      "id": "ebf78087-6dc9-4cd9-a066-99662ca405b3",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-22",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:30",
+      "arrivedAtDestination": "07:52"
+    },
+    {
+      "id": "30b130e9-056c-4c3a-a972-a72ef8279785",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-22",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:30",
+      "arrivedAtDestination": "17:53"
+    },
+    {
+      "id": "d7479e3a-35b7-442c-a02e-18d3153fb59f",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-23",
+      "dayOfWeek": 6,
+      "dayType": "saturday",
+      "scheduledDeparture": "09:00",
+      "busArrivedAt": "09:33",
+      "arrivedAtDestination": "09:56"
+    },
+    {
+      "id": "4e8e9a82-3e55-448a-89e3-dd3a1fbeafbe",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-25",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:30",
+      "arrivedAtDestination": "08:00"
+    },
+    {
+      "id": "ef55c81d-427d-42de-b084-c02f8808d99a",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-25",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:24",
+      "arrivedAtDestination": "17:47"
+    },
+    {
+      "id": "b8d52d0e-e731-40af-9b48-a871a9497b0c",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-26",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:28",
+      "arrivedAtDestination": "07:51"
+    },
+    {
+      "id": "eb4fb776-087f-4609-b27a-1f03ffc65a35",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-26",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:23",
+      "arrivedAtDestination": "17:46"
+    },
+    {
+      "id": "f56338d0-7e03-4fde-9915-5780a2f184bf",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-27",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:32",
+      "arrivedAtDestination": "08:00"
+    },
+    {
+      "id": "9170ad6b-1c79-401b-8f28-d89b12c79f12",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-27",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:21",
+      "arrivedAtDestination": "17:47"
+    },
+    {
+      "id": "0c3d08f4-1d03-4440-8415-639598f7b00e",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-28",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:34",
+      "arrivedAtDestination": "08:03"
+    },
+    {
+      "id": "a44f1cb1-5890-48dc-a4ee-0da788088c7d",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-28",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:21",
+      "arrivedAtDestination": "17:43"
+    },
+    {
+      "id": "fcbefdf5-691e-4792-ab43-fcc854d3c9d1",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-29",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:29",
+      "arrivedAtDestination": "07:57"
+    },
+    {
+      "id": "e090f2b8-d71b-49c7-960c-baeaddd62ce5",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-05-29",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:34",
+      "arrivedAtDestination": "17:54"
+    },
+    {
+      "id": "3fa01ab3-7789-4098-bbd1-8573b69d7923",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-05-30",
+      "dayOfWeek": 6,
+      "dayType": "saturday",
+      "scheduledDeparture": "09:00",
+      "busArrivedAt": "09:29",
+      "arrivedAtDestination": "09:53"
+    },
+    {
+      "id": "e02fda16-71de-4c28-bc03-59a8a4c12173",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-01",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:37",
+      "arrivedAtDestination": "08:00"
+    },
+    {
+      "id": "6bbe418f-761a-443d-9906-7c5840459bc7",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-01",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:21",
+      "arrivedAtDestination": "17:41"
+    },
+    {
+      "id": "e3d1d35c-dacb-498b-83c7-90b6388faf23",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-02",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:29",
+      "arrivedAtDestination": "07:55"
+    },
+    {
+      "id": "ae14c522-bd46-4184-868c-cfa05e8e6184",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-02",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:21",
+      "arrivedAtDestination": "17:42"
+    },
+    {
+      "id": "499886f7-6a21-4f34-87c3-4ef6bd480bf0",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-03",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:31",
+      "arrivedAtDestination": "07:51"
+    },
+    {
+      "id": "b47de3fb-8bdd-42f0-b2d9-df60cb8896f6",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-03",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:21",
+      "arrivedAtDestination": "17:44"
+    },
+    {
+      "id": "1fa587e4-188e-4901-a919-bc90f7d9cb71",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-04",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:28",
+      "arrivedAtDestination": "07:55"
+    },
+    {
+      "id": "c2946917-10d1-4618-9dc5-d30ec40780d7",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-04",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:24",
+      "arrivedAtDestination": "17:46"
+    },
+    {
+      "id": "581911c5-10ab-497b-b695-6f323b7bd11c",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-05",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:35",
+      "arrivedAtDestination": "08:03"
+    },
+    {
+      "id": "3c919990-e270-40b8-8d05-c245a84520c2",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-05",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:32",
+      "arrivedAtDestination": "17:50"
+    },
+    {
+      "id": "45a56880-6da8-4123-9ca1-fb716afc2829",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-06",
+      "dayOfWeek": 6,
+      "dayType": "saturday",
+      "scheduledDeparture": "09:00",
+      "busArrivedAt": "09:31",
+      "arrivedAtDestination": "09:53"
+    },
+    {
+      "id": "232a65de-7941-4d16-9bdd-af416d73cc34",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-08",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:33",
+      "arrivedAtDestination": "08:03"
+    },
+    {
+      "id": "c9682259-f0f0-4dfb-aee5-dca8f0dcb1f0",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-08",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:25",
+      "arrivedAtDestination": "17:48"
+    },
+    {
+      "id": "9d58124a-41d3-4224-a8cf-9e81d5d93a26",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-09",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:32",
+      "arrivedAtDestination": "07:53"
+    },
+    {
+      "id": "9643b344-8aa4-4635-9c88-75af594d1a62",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-09",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:20",
+      "arrivedAtDestination": "17:43"
+    },
+    {
+      "id": "a7a71826-9736-4318-87c1-48de6295a6fc",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-10",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:27",
+      "arrivedAtDestination": "07:54"
+    },
+    {
+      "id": "2b0261dc-d772-40fa-9cf3-16920a309fb4",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-10",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:21",
+      "arrivedAtDestination": "17:46"
+    },
+    {
+      "id": "f10f047e-ff68-4134-9c27-f6c85300aa9f",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-11",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:30",
+      "arrivedAtDestination": "07:58"
+    },
+    {
+      "id": "24404e4e-df43-4c68-8a21-79505f925d82",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-11",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:23",
+      "arrivedAtDestination": "17:42"
+    },
+    {
+      "id": "888a1887-cdcf-4f27-a2ae-f587d0e5e052",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-12",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:28",
+      "arrivedAtDestination": "07:52"
+    },
+    {
+      "id": "20c0c8dd-48b0-4e7c-ad2b-ef433f3ae18d",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-12",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:33",
+      "arrivedAtDestination": "17:58"
+    },
+    {
+      "id": "d57fd8d7-bf45-413e-8f10-3fa0f402741e",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-13",
+      "dayOfWeek": 6,
+      "dayType": "saturday",
+      "scheduledDeparture": "09:00",
+      "busArrivedAt": "09:29",
+      "arrivedAtDestination": "09:53"
+    },
+    {
+      "id": "7b8ccc6a-b175-4239-9ba8-633f44be70c5",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-15",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:37",
+      "arrivedAtDestination": "08:06"
+    },
+    {
+      "id": "5700e10d-4275-495d-a549-9ae09c94c0b3",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-15",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:21",
+      "arrivedAtDestination": "17:43"
+    },
+    {
+      "id": "19ae100e-9ca5-4c7d-93bf-5816acc08a7e",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-16",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:31",
+      "arrivedAtDestination": "07:52"
+    },
+    {
+      "id": "bbfeaf9b-b5ef-4286-8586-88392a8cd2d7",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-16",
+      "dayOfWeek": 2,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:24",
+      "arrivedAtDestination": "17:46"
+    },
+    {
+      "id": "86e7e39d-296d-426c-af7e-55fc8a006280",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-17",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:30",
+      "arrivedAtDestination": "07:57"
+    },
+    {
+      "id": "25e0d2f5-ae91-4641-809c-ec868d9de5b3",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-17",
+      "dayOfWeek": 3,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:22",
+      "arrivedAtDestination": "17:48"
+    },
+    {
+      "id": "81ca4b2d-2c1b-43e4-826d-3e51edc1b96b",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-18",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:32",
+      "arrivedAtDestination": "08:01"
+    },
+    {
+      "id": "326ef634-9709-47fa-a919-57d359814036",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-18",
+      "dayOfWeek": 4,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:24",
+      "arrivedAtDestination": "17:43"
+    },
+    {
+      "id": "345b0827-56fb-4d61-81e4-36f5f1279f0b",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-19",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:25",
+      "arrivedAtDestination": "07:51"
+    },
+    {
+      "id": "d8c061b3-d3b2-48ac-a4b8-51e7b8156675",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-19",
+      "dayOfWeek": 5,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:31",
+      "arrivedAtDestination": "17:51"
+    },
+    {
+      "id": "e0319862-e996-4be5-a5f0-1894248adc20",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-20",
+      "dayOfWeek": 6,
+      "dayType": "saturday",
+      "scheduledDeparture": "09:00",
+      "busArrivedAt": "09:33",
+      "arrivedAtDestination": "09:56"
+    },
+    {
+      "id": "89b4fff7-611f-4120-ad44-484023f3f3be",
+      "presetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1",
+      "date": "2026-06-22",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "07:00",
+      "busArrivedAt": "07:37",
+      "arrivedAtDestination": "08:01"
+    },
+    {
+      "id": "28e45b68-bbba-48af-9de1-119cb38a4e29",
+      "presetId": "0325184e-15f0-441c-b20b-1e441f9245c8",
+      "date": "2026-06-22",
+      "dayOfWeek": 1,
+      "dayType": "weekday",
+      "scheduledDeparture": "17:20",
+      "busArrivedAt": "17:20",
+      "arrivedAtDestination": "17:38"
+    }
+  ],
+  "settings": [
+    {
+      "theme": "dark",
+      "activePresetId": "42dd91fb-9c41-4238-a640-f1a94cc581b1"
+    }
+  ]
+}
