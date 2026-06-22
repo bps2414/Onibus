@@ -46,6 +46,26 @@ let cachedTickData: {
 export async function renderHomePage(): Promise<string> {
   const themeToggleHtml = renderThemeToggle();
 
+  const calendarIconSvg = `
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="18" 
+      height="18" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      stroke-width="2" 
+      stroke-linecap="round" 
+      stroke-linejoin="round" 
+      style="display: inline-block; vertical-align: middle;"
+    >
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+      <line x1="16" y1="2" x2="16" y2="6"/>
+      <line x1="8" y1="2" x2="8" y2="6"/>
+      <line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+  `;
+
   return `
     <div class="app-header">
       <div class="app-title">
@@ -56,6 +76,18 @@ export async function renderHomePage(): Promise<string> {
 
     <!-- Container para o Banner de Instalação do PWA -->
     <div id="pwa-install-container"></div>
+
+    <!-- Mostrador de Data e Horário em Tempo Real -->
+    <div class="card" id="datetime-display-card" style="margin-bottom: 20px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%); border-left: 4px solid var(--accent); box-shadow: var(--shadow-sm);">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="color: var(--accent); display: flex; align-items: center;">${calendarIconSvg}</span>
+        <span id="live-date" style="font-size: 13px; font-weight: 500; color: var(--text-secondary);">Carregando data...</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="color: var(--accent); display: flex; align-items: center;">${getIcon('clock', 18)}</span>
+        <strong id="live-time" style="font-size: 14px; font-weight: 700; color: var(--text); font-family: var(--font-mono, monospace);">00:00:00</strong>
+      </div>
+    </div>
 
     <div class="card" style="margin-bottom: 20px; padding: 12px 16px;">
       <label class="label" for="preset-selector">Trajeto Ativo</label>
@@ -296,6 +328,9 @@ export async function initHomePage(): Promise<void> {
 
   // Renderiza o banner de instalação se elegível
   handlePwaInstallBanner();
+
+  // Faz a primeira atualização instantânea do mostrador de data/hora
+  updateLiveDateTime();
 
   // Limpa qualquer temporizador anterior existente para evitar vazamento de memória e acúmulos
   if ((window as any).boraBusCountdownInterval) {
@@ -795,7 +830,34 @@ async function updateTrackerView(presetId: string): Promise<void> {
  * Recalcula apenas os valores de texto dinâmicos (countdown, status de saída)
  * sem reconstruir o DOM inteiro. Se detectar mudança estrutural, chama render completo.
  */
+/**
+ * Atualiza os elementos de data e hora em tempo real na tela.
+ */
+function updateLiveDateTime(): void {
+  const liveDateEl = document.getElementById('live-date');
+  const liveTimeEl = document.getElementById('live-time');
+  if (liveDateEl || liveTimeEl) {
+    const now = new Date();
+    if (liveDateEl) {
+      const dateOptions: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'long' };
+      let dateStr = now.toLocaleDateString('pt-BR', dateOptions);
+      // Capitaliza a primeira letra
+      dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+      liveDateEl.textContent = dateStr;
+    }
+    if (liveTimeEl) {
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      liveTimeEl.textContent = `${h}:${m}:${s}`;
+    }
+  }
+}
+
 function tickUpdate(): void {
+  // Atualiza data e hora a cada segundo
+  updateLiveDateTime();
+
   // Se não há estado renderizado ou dados em cache, não faz nada
   if (!lastRenderedState || !cachedTickData) return;
 
