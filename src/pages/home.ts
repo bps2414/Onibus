@@ -69,7 +69,7 @@ export async function renderHomePage(): Promise<string> {
   return `
     <div class="app-header">
       <div class="app-title">
-        <span>${getIcon('bus', 24, 'app-title-icon')} Bus<span class="app-title-accent">Tracker</span></span>
+        <span>${getIcon('bus', 24, 'app-title-icon')} Bora<span class="app-title-accent">Bus</span></span>
       </div>
       ${themeToggleHtml}
     </div>
@@ -78,18 +78,18 @@ export async function renderHomePage(): Promise<string> {
     <div id="pwa-install-container"></div>
 
     <!-- Mostrador de Data e Horário em Tempo Real -->
-    <div class="card" id="datetime-display-card" style="margin-bottom: 20px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%); border-left: 4px solid var(--accent); box-shadow: var(--shadow-sm);">
+    <div id="datetime-display-card" class="card" style="margin-bottom: 16px; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; background: rgba(var(--accent-rgb), 0.02); border-color: rgba(var(--accent-rgb), 0.15);">
       <div style="display: flex; align-items: center; gap: 8px;">
         <span style="color: var(--accent); display: flex; align-items: center;">${calendarIconSvg}</span>
-        <span id="live-date" style="font-size: 13px; font-weight: 500; color: var(--text-secondary);">Carregando data...</span>
+        <span id="live-date" style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">Carregando data...</span>
       </div>
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="color: var(--accent); display: flex; align-items: center;">${getIcon('clock', 18)}</span>
-        <strong id="live-time" style="font-size: 14px; font-weight: 700; color: var(--text); font-family: var(--font-mono, monospace);">00:00:00</strong>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="color: var(--accent); display: flex; align-items: center; opacity: 0.8;">${getIcon('clock', 16)}</span>
+        <strong id="live-time" style="font-size: 13.5px; font-weight: 750; color: var(--text); font-family: var(--font-mono);">00:00:00</strong>
       </div>
     </div>
 
-    <div class="card" style="margin-bottom: 20px; padding: 12px 16px;">
+    <div class="card" style="margin-bottom: 16px; padding: 16px;">
       <label class="label" for="preset-selector">Trajeto Ativo</label>
       <div style="display: flex; gap: 8px; align-items: center;">
         <select class="select" id="preset-selector" style="margin-bottom: 0; flex: 1;">
@@ -529,11 +529,11 @@ async function updateTrackerView(presetId: string): Promise<void> {
       const minLeft = timeDiffMinutes(currentTime(), pred.predictedBusArrival);
       const confColor = pred.confidence >= 75 ? 'var(--success)' : pred.confidence >= 40 ? 'var(--warning)' : 'var(--danger)';
       return `
-        <div class="card" data-next-bus-index="${idx}" style="margin-bottom: 0; padding: 10px 12px; background-color: var(--surface); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px;">
-          <span class="label" style="font-size: 8px; margin-bottom: 0; letter-spacing: 0.03em; color: var(--text-secondary);">Na sequência</span>
+        <div class="card" data-next-bus-index="${idx}" style="margin-bottom: 0; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px;">
+          <span class="label" style="font-size: 8px; margin-bottom: 0; letter-spacing: 0.04em; color: var(--text-secondary);">Na sequência</span>
           <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 4px;">
-            <strong style="font-size: 14px; color: var(--text);">~${pred.predictedBusArrival}</strong>
-            <span style="font-size: 11px; color: var(--text-secondary); font-family: monospace;">Tabela: ${pred.scheduledDeparture}</span>
+            <strong style="font-size: 15px; color: var(--text); font-family: var(--font-mono);">~${pred.predictedBusArrival}</strong>
+            <span style="font-size: 11px; color: var(--text-secondary); font-family: var(--font-mono);">Tabela: ${pred.scheduledDeparture}</span>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 10px;">
             <span class="next-bus-time" style="color: var(--text-secondary); display: flex; align-items: center; gap: 2px;">
@@ -557,7 +557,7 @@ async function updateTrackerView(presetId: string): Promise<void> {
   container.innerHTML = `
     <div class="card" style="margin-bottom: 16px; position: relative;">
       <!-- Cabeçalho do Preset -->
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="color: var(--accent); display: flex;">${getIcon(preset.icon, 32)}</span>
           <div>
@@ -574,19 +574,22 @@ async function updateTrackerView(presetId: string): Promise<void> {
         </div>
       </div>
 
-      <!-- Barra de Rotas (Origem -> Destino) -->
-      <div style="position: relative; padding-left: 20px; margin-bottom: 18px;">
-        <div style="position: absolute; left: 6px; top: 6px; bottom: 6px; width: 2px; background-color: var(--border); display: flex; flex-direction: column; justify-content: space-between; align-items: center;">
-          <div style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--accent); margin-left: -3px;"></div>
-          <div style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--success); margin-left: -3px;"></div>
+      <!-- Barra de Rotas (Origem -> Destino) — Live Activity Style -->
+      <div class="timeline-wrapper" style="margin: 20px 0 20px 8px;">
+        <div class="timeline-line"></div>
+        <div class="timeline-node active">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="label" style="font-size: 9px; margin-bottom: 0;">Embarque</span>
+            <span style="font-size: 13.5px; font-weight: 600; color: var(--text);">${boardingStop.name}</span>
+          </div>
         </div>
-        <div style="margin-bottom: 12px;">
-          <span class="label" style="font-size: 9px; margin-bottom: 2px;">Embarque</span>
-          <span style="font-size: 13px; font-weight: 600; color: var(--text);">${boardingStop.name}</span>
-        </div>
-        <div>
-          <span class="label" style="font-size: 9px; margin-bottom: 2px;">Desembarque</span>
-          <span style="font-size: 13px; font-weight: 600; color: var(--text);">${destinationStop.name}</span>
+        <div class="timeline-node success" style="margin-bottom: 0;">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <span class="label" style="font-size: 9px; margin-bottom: 0;">Desembarque</span>
+            <span style="font-size: 13.5px; font-weight: 600; color: var(--text);">${destinationStop.name}</span>
+          </div>
         </div>
       </div>
 
@@ -596,23 +599,23 @@ async function updateTrackerView(presetId: string): Promise<void> {
       <!-- Horários previstos com intervalo de confiança -->
       ${renderConfidenceInterval(prediction.predictedBusArrival, prediction.confidenceInterval)}
 
-      <div class="card" style="background-color: var(--bg); margin: 0 0 14px 0; padding: 12px; border-radius: var(--radius);">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span style="font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
-            ${getIcon('mapPin', 13)} Previsão no Ponto:
+      <div style="background-color: rgba(0, 0, 0, 0.15); margin: 0 0 16px 0; padding: 14px; border-radius: var(--radius); border: 1px solid var(--border);">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center;">
+          <span style="font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+            ${getIcon('mapPin', 14)} Previsão no Ponto:
           </span>
-          <span style="font-size: 13px; font-weight: 700; color: var(--text);">~${prediction.predictedBusArrival}</span>
+          <span style="font-size: 13.5px; font-weight: 700; color: var(--text); font-family: var(--font-mono);">~${prediction.predictedBusArrival}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span style="font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
-            ${getIcon('arrowRight', 13)} Previsão no Destino:
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center;">
+          <span style="font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+            ${getIcon('arrowRight', 14)} Previsão no Destino:
           </span>
-          <span style="font-size: 13px; font-weight: 700; color: var(--success);">
+          <span style="font-size: 13.5px; font-weight: 700; color: var(--success); font-family: var(--font-mono);">
             ${prediction.predictedDestinationArrival ? `~${prediction.predictedDestinationArrival}` : 'Sem histórico'}
           </span>
         </div>
         <!-- Badges de tendência e outliers -->
-        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
           ${renderTrendBadge(prediction.trendDirection, prediction.trendStrength)}
           ${renderOutlierBadge(prediction.outlierCount)}
         </div>
@@ -628,10 +631,10 @@ async function updateTrackerView(presetId: string): Promise<void> {
     <!-- Botões de Registro -->
     <div style="margin-top: 16px;">
       ${isTripInProgress 
-        ? `<button class="btn btn-success btn-lg" id="btn-arrive-destination" style="box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25); width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        ? `<button class="btn btn-success btn-lg" id="btn-arrive-destination" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
             ${getIcon('check', 18)} Cheguei no Destino!
            </button>`
-        : `<button class="btn btn-primary btn-lg" id="btn-bus-arrived" style="box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25); width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        : `<button class="btn btn-primary btn-lg" id="btn-bus-arrived" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
             ${getIcon('bus', 18)} Ônibus Chegou!
            </button>`
       }

@@ -283,8 +283,10 @@ async function renderList(presetFilter: string): Promise<void> {
     const headerText = `${formatDate(dateStr)} — ${dayName(dayOfWeek)}`;
 
     html += `
-      <div class="history-date-group" style="margin-bottom: 16px;">
-        <div class="history-date-header" style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.03em;">${headerText}</div>
+      <div class="history-date-group" style="margin-bottom: 24px;">
+        <div class="history-date-header" style="font-size: 11px; font-weight: 750; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 14px; letter-spacing: 0.08em; padding-bottom: 4px; border-bottom: 1px solid var(--border);">${headerText}</div>
+        <div class="timeline-wrapper" style="margin: 8px 0 8px 6px;">
+          <div class="timeline-line"></div>
     `;
 
     for (const record of groups[dateStr]) {
@@ -316,41 +318,47 @@ async function renderList(presetFilter: string): Promise<void> {
       let durationText = '';
       if (record.arrivedAtDestination) {
         const tripMinutes = timeDiffMinutes(record.busArrivedAt, record.arrivedAtDestination);
-        durationText = `⏱️ Viagem: ${formatMinutes(tripMinutes)}`;
+        durationText = `Viagem: ${formatMinutes(tripMinutes)}`;
       } else {
-        durationText = '📍 Destino não registrado';
+        durationText = 'Destino não registrado';
       }
 
       const trashIconSvg = getIcon('trash', 12);
       const arrowIconSvg = getIcon('arrowRight', 11);
 
       html += `
-        <div class="record-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px; border-radius: var(--radius);">
-          <div class="record-info">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span class="record-line-badge" style="background-color: ${lineBadgeColor}; font-size: 9px; padding: 2px 5px; border-radius: 4px; font-weight: 700;">${lineNumber}</span>
-              <span style="color: var(--accent); display: flex;">${presetIconSvg}</span>
-              <strong style="font-size: 13px; color: var(--text);">${presetName}</strong>
+        <div class="timeline-node" style="margin-bottom: 20px;">
+          <div class="timeline-dot" style="border-color: ${lineBadgeColor}; background-color: var(--surface);"></div>
+          <div class="timeline-content" style="display: flex; flex-direction: row; justify-content: space-between; align-items: flex-start; padding-left: 8px; width: 100%;">
+            <div class="record-info">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span class="record-line-badge" style="background-color: ${lineBadgeColor}; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; color: #ffffff; align-self: center;">${lineNumber}</span>
+                <span style="color: var(--accent); display: flex;">${presetIconSvg}</span>
+                <strong style="font-size: 13.5px; color: var(--text);">${presetName}</strong>
+              </div>
+              <div class="record-times" style="margin-top: 6px; font-size: 12.5px; color: var(--text-secondary);">
+                Tabela: <strong style="color: var(--text);">${record.scheduledDeparture}</strong> ${arrowIconSvg} Ponto: <strong style="color: var(--text);">${record.busArrivedAt}</strong>
+              </div>
+              <div class="record-duration" style="margin-top: 4px; font-size: 11.5px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
+                ${getIcon('clock', 12)} ${durationText}
+              </div>
             </div>
-            <div class="record-times" style="margin-top: 6px; font-size: 13px; color: var(--text-secondary);">
-              Programado: <strong style="color: var(--text);">${record.scheduledDeparture}</strong> ${arrowIconSvg} Ponto: <strong style="color: var(--text);">${record.busArrivedAt}</strong>
+            
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-left: 12px; flex-shrink: 0;">
+              <span class="record-diff ${diffClass}" style="font-size: 10px; font-weight: 800; padding: 3px 7px; border-radius: 4px; letter-spacing: 0.01em; text-transform: uppercase;">${diffText}</span>
+              <button class="list-item-btn delete delete-record-btn" data-id="${record.id}" style="padding: 4px;" title="Excluir Registro">
+                ${trashIconSvg}
+              </button>
             </div>
-            <div class="record-duration" style="margin-top: 4px; font-size: 11px; color: var(--text-secondary);">
-              ${durationText}
-            </div>
-          </div>
-          
-          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
-            <span class="record-diff ${diffClass}" style="font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">${diffText}</span>
-            <button class="list-item-btn delete delete-record-btn" data-id="${record.id}" style="padding: 4px 6px;" title="Excluir Registro">
-              ${trashIconSvg}
-            </button>
           </div>
         </div>
       `;
     }
 
-    html += `</div>`; // fecha history-date-group
+    html += `
+        </div> <!-- fecha timeline-wrapper -->
+      </div> <!-- fecha history-date-group -->
+    `;
   }
 
   container.innerHTML = html;
