@@ -133,6 +133,14 @@ p {
 }
 
 /* Cards Premium */
+.stat-card {
+  background-color: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+}
+
 .card {
   background-color: var(--glass-bg);
   border: 1px solid var(--glass-border);
@@ -919,7 +927,7 @@ p {
 /* Grid de Ícones e Emojis no Cadastro */
 .icon-grid {
   display: grid;
-  grid-template-cols: repeat(5, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
   margin-bottom: 16px;
 }

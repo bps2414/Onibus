@@ -37,11 +37,6 @@ export function renderNavbar(activePage: string): string {
 
   return `
     <nav class="navbar">
-      <!-- Logo visível apenas no layout desktop lateral -->
-      <div class="navbar-logo-desktop">
-        <span class="navbar-logo-icon">🚌</span>
-        <span>Bora<span class="app-title-accent">Bus</span></span>
-      </div>
       <div class="navbar-items-wrapper">
         ${itemsHtml}
       </div>

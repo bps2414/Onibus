@@ -299,7 +299,7 @@ export function calculateOverallStats(
   let mostDelayedDay: string | null = null
   let mostPunctualDay: string | null = null
 
-  if (daysWithData.length > 0) {
+  if (daysWithData.length > 1) {
     const sorted = [...daysWithData].sort((a, b) => a.avgDelay - b.avgDelay)
     mostPunctualDay = sorted[0].dayName
     mostDelayedDay = sorted[sorted.length - 1].dayName

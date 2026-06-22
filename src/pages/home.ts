@@ -416,6 +416,7 @@ function renderEmptyState(): void {
  * @param presetId - O ID do preset ativo
  */
 async function updateTrackerView(presetId: string): Promise<void> {
+  lastTickMinute = -1; // Invalida o cache de IA
   const container = document.getElementById('home-tracker-content');
   if (!container || presetId === 'none') return;
 
@@ -724,35 +725,53 @@ function updateLiveDateTime(): void {
   }
 }
 
+// Variáveis para controle de throttle das predições pesadas
+let lastTickMinute = -1;
+let cachedPredictionsArray: Prediction[] = [];
+let cachedCurrentPrediction: Prediction | null = null;
+
 function tickUpdate(): void {
-  // Atualiza data e hora a cada segundo
+  // Atualiza data e hora a cada segundo (operação leve)
   updateLiveDateTime();
 
   // Se não há estado renderizado ou dados em cache, não faz nada
   if (!lastRenderedState || !cachedTickData) return;
 
-  const { preset, schedules, presetRecords } = cachedTickData;
-  const currentDayType = detectDayType(new Date());
+  const now = new Date();
+  const currentMinute = now.getMinutes();
 
-  // Recalcula a previsão atual
-  let prediction: Prediction | null = null;
-  let predictions: Prediction[] = [];
+  // Recalcula as predições de inteligência artificial APENAS quando o minuto vira, não todo segundo
+  if (currentMinute !== lastTickMinute || cachedPredictionsArray.length === 0) {
+    lastTickMinute = currentMinute;
+    
+    const { preset, schedules, presetRecords } = cachedTickData;
+    const currentDayType = detectDayType(now);
 
-  if (preset.preferredScheduleId && preset.preferredScheduleId !== 'none') {
-    const preferredSchedule = schedules.find(s => s.id === preset.preferredScheduleId);
-    if (preferredSchedule && preferredSchedule.dayType === currentDayType) {
-      prediction = predictArrival(preferredSchedule, preset, presetRecords);
-      predictions = findNextBuses(preset, schedules, presetRecords, currentDayType, 3, preferredSchedule.departureTime);
-      if (predictions.length === 0 || predictions[0].scheduledDeparture !== preferredSchedule.departureTime) {
-        predictions.unshift(prediction);
+    let prediction: Prediction | null = null;
+    let predictions: Prediction[] = [];
+
+    if (preset.preferredScheduleId && preset.preferredScheduleId !== 'none') {
+      const preferredSchedule = schedules.find(s => s.id === preset.preferredScheduleId);
+      if (preferredSchedule && preferredSchedule.dayType === currentDayType) {
+        prediction = predictArrival(preferredSchedule, preset, presetRecords);
+        predictions = findNextBuses(preset, schedules, presetRecords, currentDayType, 3, preferredSchedule.departureTime);
+        if (predictions.length === 0 || predictions[0].scheduledDeparture !== preferredSchedule.departureTime) {
+          predictions.unshift(prediction);
+        }
       }
     }
+
+    if (!prediction) {
+      predictions = findNextBuses(preset, schedules, presetRecords, currentDayType, 3);
+      prediction = predictions[0] || null;
+    }
+
+    cachedCurrentPrediction = prediction;
+    cachedPredictionsArray = predictions;
   }
 
-  if (!prediction) {
-    predictions = findNextBuses(preset, schedules, presetRecords, currentDayType, 3);
-    prediction = predictions[0] || null;
-  }
+  const prediction = cachedCurrentPrediction;
+  const predictions = cachedPredictionsArray;
 
   if (!prediction) return;
 

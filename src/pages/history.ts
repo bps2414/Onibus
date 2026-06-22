@@ -259,12 +259,12 @@ async function renderList(presetFilter: string): Promise<void> {
     return;
   }
 
-  // Ordena os registros: data descrescente e depois hora real de chegada descrescente
+  // Ordena os registros: data descrescente e depois hora real de chegada descrescente e limita a 50
   const sortedRecords = filteredRecords.sort((a, b) => {
     const dateCompare = b.date.localeCompare(a.date);
     if (dateCompare !== 0) return dateCompare;
     return b.busArrivedAt.localeCompare(a.busArrivedAt);
-  });
+  }).slice(0, 50);
 
   // Agrupa os registros pela string de data
   const groups: Record<string, TripRecord[]> = {};
