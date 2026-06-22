@@ -13,12 +13,16 @@ import { initThemeToggle, applyThemeToDocument } from './components/theme-toggle
 
 
 
+let latestNavId = 0;
+
 /**
  * Executa a navegação de páginas baseado no hash URL.
  * 
  * @param hash - O hash URL atual da janela (ex: "#home")
  */
 async function navigate(hash: string) {
+  const navId = ++latestNavId;
+
   // Limpa o timer do countdown ativo ao sair da home
   if ((window as any).boraBusCountdownInterval) {
     clearInterval((window as any).boraBusCountdownInterval);
@@ -34,7 +38,7 @@ async function navigate(hash: string) {
   let html = '';
   
   // Renderiza o HTML estático correspondente
-    switch (page) {
+  switch (page) {
     case 'home':
       html = await renderHomePage();
       break;
@@ -54,6 +58,9 @@ async function navigate(hash: string) {
       html = await renderHomePage();
       break;
   }
+
+  // Se uma nova navegação começou enquanto renderizávamos, aborta esta
+  if (navId !== latestNavId) return;
 
   // Atualiza o DOM e adiciona a barra de navegação correspondente
   app.innerHTML = `<div class="page-content" data-page="${page}">${html}</div>` + renderNavbar(page);
@@ -79,6 +86,9 @@ async function navigate(hash: string) {
       await initHomePage();
       break;
   }
+
+  // Se uma nova navegação começou durante o init, aborta lógica subsequente
+  if (navId !== latestNavId) return;
 
   // Inicializa a lógica de tema (anexa eventos do toggle)
   initThemeToggle();

@@ -50,11 +50,37 @@ function standardDeviation(values: number[]): number {
 }
 
 /**
- * Calcula o atraso (offset) de um registro.
- * Quantos minutos após o horário da tabela o ônibus chegou no ponto.
+ * Calcula a média de tempo de percurso (offset) de cada Preset (Trajeto)
+ * a partir de todos os registros que não são outliers.
  */
-function recordDelay(record: TripRecord): number {
-  return timeDiffMinutes(record.scheduledDeparture, record.busArrivedAt)
+export function calculatePresetBaselines(records: TripRecord[]): Map<string, number> {
+  const baselines = new Map<string, number>()
+  const offsetsByPreset = new Map<string, number[]>()
+
+  for (const record of records) {
+    if (record.isOutlier) continue
+    const offset = timeDiffMinutes(record.scheduledDeparture, record.busArrivedAt)
+    const list = offsetsByPreset.get(record.presetId) ?? []
+    list.push(offset)
+    offsetsByPreset.set(record.presetId, list)
+  }
+
+  for (const [presetId, list] of offsetsByPreset.entries()) {
+    if (list.length > 0) {
+      baselines.set(presetId, average(list))
+    }
+  }
+
+  return baselines
+}
+
+/**
+ * Calcula o atraso real de um registro com base no desvio da média aprendida (baseline).
+ */
+export function getRecordDelay(record: TripRecord, baselines: Map<string, number>): number {
+  const actualOffset = timeDiffMinutes(record.scheduledDeparture, record.busArrivedAt)
+  const baseline = baselines.get(record.presetId) ?? actualOffset
+  return actualOffset - baseline
 }
 
 /**
@@ -79,7 +105,8 @@ export function filterRecordsByPeriod(records: TripRecord[], days: number): Trip
  * Calcula estatísticas por dia da semana (0=domingo a 6=sábado).
  * Retorna um array com 7 itens, um pra cada dia.
  */
-export function calculateDayStats(records: TripRecord[]): DayStats[] {
+export function calculateDayStats(records: TripRecord[], baselines?: Map<string, number>): DayStats[] {
+  const activeBaselines = baselines ?? calculatePresetBaselines(records)
   // Agrupa registros por dia da semana
   const byDay = new Map<number, TripRecord[]>()
   for (let i = 0; i < 7; i++) {
@@ -93,7 +120,7 @@ export function calculateDayStats(records: TripRecord[]): DayStats[] {
 
   // Calcula stats pra cada dia
   return Array.from(byDay.entries()).map(([dow, dayRecords]) => {
-    const delays = dayRecords.map(recordDelay)
+    const delays = dayRecords.map(r => getRecordDelay(r, activeBaselines))
     const durations = dayRecords
       .map(recordTripDuration)
       .filter((d): d is number => d !== null)
@@ -115,8 +142,10 @@ export function calculateDayStats(records: TripRecord[]): DayStats[] {
  * Usa o slope da regressão pra determinar direção.
  */
 export function calculateTrend(
-  records: TripRecord[]
+  records: TripRecord[],
+  baselines?: Map<string, number>
 ): 'improving' | 'worsening' | 'stable' | 'insufficient_data' {
+  const activeBaselines = baselines ?? calculatePresetBaselines(records)
   // Filtra registros dos últimos 14 dias
   const recent = records.filter((r) => daysSince(r.date) <= 14)
 
@@ -128,7 +157,7 @@ export function calculateTrend(
   // Monta pontos pra regressão (x = dias desde o registro, invertido)
   const points = recent.map(r => ({
     x: 14 - daysSince(r.date), // x crescente com o tempo
-    y: recordDelay(r),
+    y: getRecordDelay(r, activeBaselines),
   }))
 
   const regression = linearRegression(points)
@@ -222,26 +251,23 @@ export function calculateBacktestResults(
 }
 
 /**
- * Calcula o score de confiabilidade de uma linha baseado nos registros.
- * Wrapper que extrai os offsets e chama calculateLineReliability do prediction-utils.
+ * Score de confiabilidade
  */
 export function getLineReliabilityScore(records: TripRecord[]): number {
+  const baselines = calculatePresetBaselines(records)
   const offsets = records
     .filter(r => !r.isOutlier)
-    .map(recordDelay)
+    .map(r => getRecordDelay(r, baselines))
   return calculateLineReliability(offsets)
 }
 
 /**
- * Calcula estatísticas gerais de todos os registros.
- * Inclui atraso médio, duração de viagem, dia mais/menos pontual,
- * tendência recente e precisão das previsões.
+ * Calcula estatísticas gerais
  */
 export function calculateOverallStats(
   records: TripRecord[],
   schedules: Schedule[]
 ): OverallStats {
-  // Sem registros: retorna stats vazias
   if (records.length === 0) {
     return {
       totalRecords: 0,
@@ -255,11 +281,11 @@ export function calculateOverallStats(
     }
   }
 
-  // Atraso médio geral
-  const delays = records.map(recordDelay)
+  const baselines = calculatePresetBaselines(records)
+
+  const delays = records.map(r => getRecordDelay(r, baselines))
   const avgDelay = Math.round(average(delays) * 10) / 10
 
-  // Duração média de viagem (só registros com dado de destino)
   const durations = records
     .map(recordTripDuration)
     .filter((d): d is number => d !== null)
@@ -267,10 +293,8 @@ export function calculateOverallStats(
     ? Math.round(average(durations) * 10) / 10
     : null
 
-  // Stats por dia da semana
-  const delayByDay = calculateDayStats(records)
+  const delayByDay = calculateDayStats(records, baselines)
 
-  // Dia mais atrasado e mais pontual (só dias com dados)
   const daysWithData = delayByDay.filter((d) => d.recordCount > 0)
   let mostDelayedDay: string | null = null
   let mostPunctualDay: string | null = null
@@ -281,8 +305,7 @@ export function calculateOverallStats(
     mostDelayedDay = sorted[sorted.length - 1].dayName
   }
 
-  // Tendência recente (agora usa regressão linear)
-  const recentTrend = calculateTrend(records)
+  const recentTrend = calculateTrend(records, baselines)
 
   return {
     totalRecords: records.length,
@@ -292,6 +315,6 @@ export function calculateOverallStats(
     mostPunctualDay,
     delayByDay,
     recentTrend,
-    predictionAccuracy: null, // Calculado separadamente (precisa do preset e schedules)
+    predictionAccuracy: null,
   }
 }

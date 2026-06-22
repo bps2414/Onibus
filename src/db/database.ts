@@ -40,19 +40,22 @@ const DATA_STORES = [
 
 /** Instância cacheada do banco */
 let cachedDb: IDBDatabase | null = null
+let dbInitPromise: Promise<IDBDatabase> | null = null
 
 /**
  * Inicializa o banco IndexedDB, criando stores e índices se necessário.
  * Retorna a instância do banco pronta pra uso.
  */
 export function initDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    // Se já temos uma instância aberta, reutiliza
-    if (cachedDb) {
-      resolve(cachedDb)
-      return
-    }
+  if (cachedDb) {
+    return Promise.resolve(cachedDb)
+  }
 
+  if (dbInitPromise) {
+    return dbInitPromise
+  }
+
+  dbInitPromise = new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION)
 
     // Criação/atualização do schema do banco
@@ -98,15 +101,20 @@ export function initDB(): Promise<IDBDatabase> {
       // Se a conexão for fechada inesperadamente, limpa o cache
       cachedDb.onclose = () => {
         cachedDb = null
+        dbInitPromise = null
       }
 
+      dbInitPromise = null
       resolve(cachedDb)
     }
 
     request.onerror = () => {
+      dbInitPromise = null
       reject(new Error(`Erro ao abrir o banco IndexedDB: ${request.error?.message}`))
     }
   })
+
+  return dbInitPromise
 }
 
 /**
@@ -319,14 +327,63 @@ export async function getAllData(): Promise<Record<string, unknown[]>> {
   return result
 }
 
+function isValidBusLine(item: any): item is BusLine {
+  return typeof item === 'object' && item !== null && typeof item.id === 'string' && typeof item.name === 'string' && typeof item.number === 'string'
+}
+
+function isValidBusStop(item: any): item is BusStop {
+  return typeof item === 'object' && item !== null && typeof item.id === 'string' && typeof item.name === 'string'
+}
+
+function isValidSchedule(item: any): item is Schedule {
+  return typeof item === 'object' && item !== null && typeof item.id === 'string' && typeof item.lineId === 'string' && typeof item.departureTime === 'string' && (item.dayType === 'weekday' || item.dayType === 'saturday' || item.dayType === 'sunday_holiday')
+}
+
+function isValidPreset(item: any): item is Preset {
+  return typeof item === 'object' && item !== null && typeof item.id === 'string' && typeof item.name === 'string' && typeof item.icon === 'string' && typeof item.lineId === 'string' && typeof item.boardingStopId === 'string' && typeof item.destinationStopId === 'string'
+}
+
+function isValidTripRecord(item: any): item is TripRecord {
+  return typeof item === 'object' && item !== null && typeof item.id === 'string' && typeof item.presetId === 'string' && typeof item.date === 'string' && typeof item.dayOfWeek === 'number' && (item.dayType === 'weekday' || item.dayType === 'saturday' || item.dayType === 'sunday_holiday') && typeof item.scheduledDeparture === 'string' && typeof item.busArrivedAt === 'string'
+}
+
 /**
  * Importa todos os dados de um objeto de backup, substituindo o conteúdo atual.
- * Limpa cada store antes de importar.
+ * Limpa cada store antes de importar. Realiza pre-flight validation.
  */
 export async function importAllData(data: Record<string, unknown[]>): Promise<void> {
+  // 1. Validação prévia de integridade dos dados (pre-flight validation)
+  for (const storeName of DATA_STORES) {
+    const items = data[storeName]
+    if (items === undefined) continue // Permite que a store não exista no backup, mas valida se existir
+    if (!Array.isArray(items)) {
+      throw new Error(`Backup inválido: a store '${storeName}' não é uma lista.`)
+    }
+
+    for (const item of items) {
+      let valid = false
+      if (storeName === 'busLines') valid = isValidBusLine(item)
+      else if (storeName === 'busStops') valid = isValidBusStop(item)
+      else if (storeName === 'schedules') valid = isValidSchedule(item)
+      else if (storeName === 'presets') valid = isValidPreset(item)
+      else if (storeName === 'tripRecords') valid = isValidTripRecord(item)
+
+      if (!valid) {
+        throw new Error(`Dados inválidos ou corrompidos detectados na store '${storeName}'. Importação abortada.`)
+      }
+    }
+  }
+
+  // Validação de configurações
+  if (data['settings'] !== undefined) {
+    if (!Array.isArray(data['settings']) || (data['settings'].length > 0 && typeof data['settings'][0] !== 'object')) {
+      throw new Error("Backup inválido: configurações corrompidas.")
+    }
+  }
+
+  // 2. Importação real após passar na validação
   const db = await getDB()
 
-  // Importa cada store de dados
   for (const storeName of DATA_STORES) {
     const items = data[storeName]
     if (!Array.isArray(items)) continue

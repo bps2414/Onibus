@@ -9,6 +9,7 @@ import { getDayOfWeek, generateId, detectDayType } from '../utils/helpers';
 import { showToast } from '../components/toast';
 import { showModal, closeModal } from '../components/modal';
 import { getIcon } from '../components/icons';
+import { calculatePresetBaselines, getRecordDelay } from '../services/statistics';
 
 /**
  * Renderiza o esqueleto HTML da página de histórico com seletor de filtros e botão de adição.
@@ -234,6 +235,8 @@ async function renderList(presetFilter: string): Promise<void> {
     getAll<BusLine>('busLines')
   ]);
 
+  const baselines = calculatePresetBaselines(records);
+
   // Filtra registros pelo preset selecionado
   const filteredRecords = presetFilter === 'all'
     ? records
@@ -293,8 +296,8 @@ async function renderList(presetFilter: string): Promise<void> {
       const lineBadgeColor = line ? line.color : 'var(--border)';
       const lineNumber = line ? line.number : '??';
 
-      // Calcula diferença (real - programado)
-      const diff = timeDiffMinutes(record.scheduledDeparture, record.busArrivedAt);
+      // Calcula diferença inteligente baseada no baseline
+      const diff = Math.round(getRecordDelay(record, baselines));
       let diffText = '';
       let diffClass = 'green';
 

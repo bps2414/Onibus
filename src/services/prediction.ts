@@ -197,7 +197,7 @@ function weightedAverage(
   const variance =
     items.reduce((sum, item) => sum + item.weight * (item.value - average) ** 2, 0) / totalWeight
 
-  return { average, totalWeight, variance, stdDev: Math.sqrt(variance) }
+  return { average, totalWeight, variance, stdDev: Math.sqrt(Math.max(0, variance)) }
 }
 
 /**
@@ -205,31 +205,29 @@ function weightedAverage(
  * Com 0: usa preset, com 1: 80% real + 20% preset, com 2-3: média + blending progressivo.
  */
 function coldStartOffset(
-  records: WeightedRecord[],
-  presetOffset: number
+  records: WeightedRecord[]
 ): { offset: number; isColdStart: boolean } {
   // Filtra registros válidos (não outliers, com peso > 0)
   const validRecords = records.filter(r => !r.isOutlier && r.weight > 0)
 
   if (validRecords.length === 0) {
-    // Sem dados: usa estimativa manual do preset
-    return { offset: presetOffset, isColdStart: true }
+    // Sem dados: assume offset 0 (sai no horário do terminal)
+    return { offset: 0, isColdStart: true }
   }
 
   if (validRecords.length === 1) {
-    // 1 registro: 80% dado real + 20% preset
+    // 1 registro: 100% dado real
     return {
-      offset: validRecords[0].offset * 0.8 + presetOffset * 0.2,
+      offset: validRecords[0].offset,
       isColdStart: true,
     }
   }
 
   if (validRecords.length <= 3) {
-    // 2-3 registros: média simples + blending progressivo com preset
+    // 2-3 registros: média simples
     const avg = validRecords.reduce((sum, r) => sum + r.offset, 0) / validRecords.length
-    const blendFactor = validRecords.length / 4 // 0.5 pra 2 registros, 0.75 pra 3
     return {
-      offset: avg * blendFactor + presetOffset * (1 - blendFactor),
+      offset: avg,
       isColdStart: true,
     }
   }
@@ -334,7 +332,7 @@ export function predictArrival(
 
   // ─── Cold Start Check ──────────────────────────────────────────
 
-  const coldStart = coldStartOffset(weighted, preset.estimatedBoardingOffset)
+  const coldStart = coldStartOffset(weighted)
 
   // ─── Previsão do offset de embarque ─────────────────────────────
 
@@ -360,19 +358,10 @@ export function predictArrival(
       totalWeight = offsetResult.totalWeight
       variance = offsetResult.variance
       stdDev = offsetResult.stdDev
-
-      // Blending com estimativa manual quando tem poucos dados
-      if (totalWeight < PREDICTION_CONFIG.BLEND_THRESHOLD) {
-        const blendFactor = totalWeight / PREDICTION_CONFIG.BLEND_THRESHOLD
-        finalOffset =
-          blendFactor * offsetResult.average +
-          (1 - blendFactor) * preset.estimatedBoardingOffset
-      } else {
-        finalOffset = offsetResult.average
-      }
+      finalOffset = offsetResult.average
     } else {
       // Sem dados válidos (todos eram outliers?)
-      finalOffset = preset.estimatedBoardingOffset
+      finalOffset = 0
       totalWeight = 0
       variance = 0
       stdDev = 0
@@ -414,24 +403,7 @@ export function predictArrival(
   let predictedDestinationArrival: string | null = null
 
   if (tripResult) {
-    // Blending com estimativa manual
-    const tripTotalWeight = tripResult.totalWeight
-    if (tripTotalWeight < PREDICTION_CONFIG.BLEND_THRESHOLD) {
-      const blendFactor = tripTotalWeight / PREDICTION_CONFIG.BLEND_THRESHOLD
-      predictedTripDuration =
-        blendFactor * tripResult.average +
-        (1 - blendFactor) * preset.estimatedTripDuration
-    } else {
-      predictedTripDuration = tripResult.average
-    }
-
-    predictedDestinationArrival = addMinutes(
-      predictedBusArrival,
-      Math.round(predictedTripDuration)
-    )
-  } else if (preset.estimatedTripDuration > 0) {
-    // Sem dados de viagem: usa estimativa manual
-    predictedTripDuration = preset.estimatedTripDuration
+    predictedTripDuration = tripResult.average
     predictedDestinationArrival = addMinutes(
       predictedBusArrival,
       Math.round(predictedTripDuration)

@@ -499,61 +499,9 @@ async function updateTrackerView(presetId: string): Promise<void> {
   // Calcula os minutos restantes até a chegada prevista
   const minutesLeft = minutesUntilArrival(prediction);
 
-  // Calcula margem de segurança — usa walkTimeToStop (caminhada) + buffer (margem)
-  const buffer = preset.bufferTime ?? 0;
-  const walkTime = preset.walkTimeToStop ?? 10;
-  const totalLeaveOffset = walkTime + buffer;
-  const timeToLeave = addMinutes(prediction.predictedBusArrival, -totalLeaveOffset);
-  const minutesToLeave = timeDiffMinutes(currentTime(), timeToLeave);
-
-  // Lógica de Notificações Inteligentes (Offline e Background via Service Worker)
-  const isNotifEnabled = localStorage.getItem(`notify-preset-${preset.id}`) === 'true';
-  if (isNotifEnabled) {
-    const notifiedKey = `${preset.id}-${prediction.scheduledDeparture}-${currentDate()}`;
-
-    if (minutesToLeave > 0) {
-      // O alarme deve tocar no futuro. Agendamos/reagendamos no Service Worker.
-      const delayMs = minutesToLeave * 60 * 1000;
-      const lastScheduled = localStorage.getItem(`alarm-scheduled-${preset.id}`);
-      const newScheduleValue = `${prediction.predictedBusArrival}-${delayMs}`;
-
-      if (lastScheduled !== newScheduleValue) {
-        localStorage.setItem(`alarm-scheduled-${preset.id}`, newScheduleValue);
-        sendAlarmToServiceWorker(
-          preset.id,
-          delayMs,
-          prediction.predictedBusArrival,
-          line?.number || preset.lineId
-        );
-      }
-    } else if (minutesToLeave <= 0 && minutesLeft > 0) {
-      // O usuário está atrasado para a saída recomendada, mas o ônibus ainda não passou.
-      // Mostramos notificação imediata se ainda não foi disparada hoje para esta viagem.
-      if (!notifiedTrips[notifiedKey]) {
-        notifiedTrips[notifiedKey] = true;
-        
-        // Cancela qualquer alarme pendente no SW
-        sendAlarmToServiceWorker(preset.id, 0, '', '', true);
-        localStorage.removeItem(`alarm-scheduled-${preset.id}`);
-
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification('BoraBus: Hora de Sair!', {
-            body: `Você está atrasado para o ônibus da Linha ${line?.number || ''}! Previsão de chegada no ponto: ${prediction.predictedBusArrival}. Vá correndo!`,
-            icon: '/favicon.ico',
-            vibrate: [200, 100, 200, 100, 300]
-          } as any);
-        }
-      }
-    } else {
-      // O ônibus já passou. Limpamos o alarme.
-      sendAlarmToServiceWorker(preset.id, 0, '', '', true);
-      localStorage.removeItem(`alarm-scheduled-${preset.id}`);
-    }
-  } else {
-    // Alertas desativados. Garantimos que nenhum temporizador fique ativo.
-    sendAlarmToServiceWorker(preset.id, 0, '', '', true);
-    localStorage.removeItem(`alarm-scheduled-${preset.id}`);
-  }
+  // Alertas desativados de tempo de caminhada. Garantimos que nenhum temporizador fique ativo.
+  sendAlarmToServiceWorker(preset.id, 0, '', '', true);
+  localStorage.removeItem(`alarm-scheduled-${preset.id}`);
 
   // Calcula se há viagem em andamento (precisa vir antes do cache)
   const isTripInProgress = activeTripRecord !== null;
@@ -572,48 +520,6 @@ async function updateTrackerView(presetId: string): Promise<void> {
   // Renderiza os componentes de UI
   const countdownHtml = renderCountdown(minutesLeft);
   const confidenceHtml = renderConfidence(prediction.confidence, prediction.recordCount, prediction.reliability);
-
-  // Renderização da seção recomendada de saída
-  let leaveHtml = '';
-  if (!isTripInProgress && minutesLeft > 0) {
-    let leaveStatusText = '';
-    let leaveColorStyle = 'var(--success)';
-    let pulseClass = 'pulse-green';
-
-    if (minutesToLeave < 0) {
-      leaveStatusText = 'Atrasado! Vá correndo';
-      leaveColorStyle = 'var(--danger)';
-      pulseClass = 'pulse-red';
-    } else if (minutesToLeave === 0) {
-      leaveStatusText = 'Saia agora!';
-      leaveColorStyle = 'var(--warning)';
-      pulseClass = 'pulse-yellow';
-    } else if (minutesToLeave <= 3) {
-      leaveStatusText = `Saia em ${minutesToLeave} min`;
-      leaveColorStyle = 'var(--warning)';
-      pulseClass = 'pulse-yellow';
-    } else {
-      leaveStatusText = `Saia em ${minutesToLeave} min`;
-      leaveColorStyle = 'var(--success)';
-      pulseClass = 'pulse-green';
-    }
-
-    leaveHtml = `
-      <div id="leave-card" class="card countdown-container ${pulseClass}" style="background-color: var(--bg); margin: 0 0 16px 0; padding: 12px 14px; border-radius: var(--radius); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="color: var(--accent); display: flex;">${getIcon('clock', 20)}</span>
-          <div>
-            <span class="label" style="font-size: 9px; margin-bottom: 0; letter-spacing: 0.02em;">Sair de Casa às</span>
-            <strong id="leave-time-value" style="font-size: 15px; color: var(--text);">${timeToLeave}</strong>
-          </div>
-        </div>
-        <div style="text-align: right;">
-          <span style="font-size: 10px; color: var(--text-secondary); display: block; margin-bottom: 2px;">Margem: ${buffer}m | Caminhada: ${walkTime}m</span>
-          <strong id="leave-status-text" style="font-size: 13px; color: ${leaveColorStyle};">${leaveStatusText}</strong>
-        </div>
-      </div>
-    `;
-  }
 
   // Gera o HTML para os próximos ônibus da sequência
   let nextBusesGridHtml = '';
@@ -687,9 +593,6 @@ async function updateTrackerView(presetId: string): Promise<void> {
       <!-- Componente do Contador Principal -->
       ${countdownHtml}
 
-      <!-- Recomendação de Saída baseada na caminhada + margem de segurança -->
-      ${leaveHtml}
-
       <!-- Horários previstos com intervalo de confiança -->
       ${renderConfidenceInterval(prediction.predictedBusArrival, prediction.confidenceInterval)}
 
@@ -745,49 +648,13 @@ async function updateTrackerView(presetId: string): Promise<void> {
       const now = new Date();
       const h = String(now.getHours()).padStart(2, '0');
       const m = String(now.getMinutes()).padStart(2, '0');
-      const s = String(now.getSeconds()).padStart(2, '0');
       const nowStr = `${h}:${m}`;
-      const nowWithSecondsStr = `${h}:${m}:${s}`;
       const currentDayType = detectDayType(now);
 
-      // Busca tabelas de horários do dia
-      const daySchedules = await getSchedulesByLine(preset.lineId, currentDayType);
-
-      if (daySchedules.length === 0) {
-        showToast('Nenhum horário cadastrado nesta linha para hoje.', 'error');
-        return;
-      }
-
-      // Calcula as diferenças absolutas em minutos para cada horário
-      const schedulesWithDiff = daySchedules.map(schedule => {
-        return {
-          schedule,
-          diff: Math.abs(timeDiffMinutes(schedule.departureTime, nowStr))
-        };
-      }).sort((a, b) => a.diff - b.diff);
-
-      let chosenSchedule = schedulesWithDiff[0].schedule;
-      
-      // Se houver mais de um horário e ambos estiverem a menos de 20 minutos de agora, há ambiguidade
-      const isAmbiguous = schedulesWithDiff.length > 1 && 
-                         schedulesWithDiff[0].diff <= 20 && 
-                         schedulesWithDiff[1].diff <= 20;
-
-      if (isAmbiguous) {
-        const opt1 = schedulesWithDiff[0].schedule.departureTime;
-        const opt2 = schedulesWithDiff[1].schedule.departureTime;
-        const chooseFirst = window.confirm(
-          `Identificamos dois horários próximos da tabela.\n\n` +
-          `Clique em OK para registrar para a saída das ${opt1}\n` +
-          `ou CANCELAR para registrar para a saída das ${opt2}.`
-        );
-        chosenSchedule = chooseFirst ? schedulesWithDiff[0].schedule : schedulesWithDiff[1].schedule;
-      } else {
-        const confirmReg = window.confirm(
-          `Deseja registrar o embarque para o ônibus com saída programada das ${chosenSchedule.departureTime}?`
-        );
-        if (!confirmReg) return; // Cancela o registro
-      }
+      const confirmReg = window.confirm(
+        `Deseja registrar o embarque para o ônibus com saída programada das ${prediction.scheduledDeparture}?`
+      );
+      if (!confirmReg) return; // Cancela o registro
 
       // Cria o registro da viagem
       const record: TripRecord = {
@@ -796,8 +663,8 @@ async function updateTrackerView(presetId: string): Promise<void> {
         date: currentDate(),
         dayOfWeek: now.getDay(),
         dayType: currentDayType,
-        scheduledDeparture: chosenSchedule.departureTime,
-        busArrivedAt: nowWithSecondsStr
+        scheduledDeparture: prediction.scheduledDeparture,
+        busArrivedAt: nowStr
       };
 
       // Salva e atualiza o estado
@@ -929,52 +796,7 @@ function tickUpdate(): void {
     countdownEl.className = `countdown ${colorClass}`;
   }
 
-  // Atualiza o card de "hora de sair"
-  if (!isTripInProgress && minutesLeft > 0) {
-    const buffer = preset.bufferTime ?? 0;
-    const walkTime = preset.walkTimeToStop ?? 10;
-    const totalLeaveOffset = walkTime + buffer;
-    const timeToLeave = addMinutes(prediction.predictedBusArrival, -totalLeaveOffset);
-    const minutesToLeave = timeDiffMinutes(currentTime(), timeToLeave);
 
-    const leaveTimeEl = document.getElementById('leave-time-value');
-    const leaveStatusEl = document.getElementById('leave-status-text');
-    const leaveCard = document.getElementById('leave-card');
-
-    if (leaveTimeEl) leaveTimeEl.textContent = timeToLeave;
-
-    if (leaveStatusEl) {
-      let leaveStatusText = '';
-      let leaveColorStyle = 'var(--success)';
-      let pulseClass = 'pulse-green';
-
-      if (minutesToLeave < 0) {
-        leaveStatusText = 'Atrasado! Vá correndo';
-        leaveColorStyle = 'var(--danger)';
-        pulseClass = 'pulse-red';
-      } else if (minutesToLeave === 0) {
-        leaveStatusText = 'Saia agora!';
-        leaveColorStyle = 'var(--warning)';
-        pulseClass = 'pulse-yellow';
-      } else if (minutesToLeave <= 3) {
-        leaveStatusText = `Saia em ${minutesToLeave} min`;
-        leaveColorStyle = 'var(--warning)';
-        pulseClass = 'pulse-yellow';
-      } else {
-        leaveStatusText = `Saia em ${minutesToLeave} min`;
-        leaveColorStyle = 'var(--success)';
-        pulseClass = 'pulse-green';
-      }
-
-      leaveStatusEl.textContent = leaveStatusText;
-      leaveStatusEl.style.color = leaveColorStyle;
-
-      // Atualiza a classe de pulso no card
-      if (leaveCard) {
-        leaveCard.className = `card countdown-container ${pulseClass}`;
-      }
-    }
-  }
 
   // Atualiza os cards de "próximos ônibus" (minutos restantes)
   const nextBusCards = document.querySelectorAll('[data-next-bus-index]');

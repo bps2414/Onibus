@@ -27,6 +27,10 @@ export function timeDiffMinutes(a: string, b: string): number {
   if (diff < -720) {
     diff += 1440
   }
+  // Se a diferença for muito positiva, provavelmente cruzou meia-noite no sentido inverso (ex: adiantado antes da meia-noite)
+  if (diff > 720) {
+    diff -= 1440
+  }
 
   return diff
 }

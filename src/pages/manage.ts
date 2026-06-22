@@ -155,21 +155,7 @@ export async function renderManagePage(): Promise<string> {
             <option value="">Selecione o ponto de desembarque...</option>
           </select>
 
-          <label class="label" for="preset-boarding-offset">Tempo do Terminal até seu Ponto (Minutos)</label>
-          <input type="number" id="preset-boarding-offset" class="input" min="0" value="30" placeholder="Ex: 30" required />
-          <span class="field-hint">Quantos minutos o ônibus demora do terminal/início da linha até chegar no seu ponto? Pode chutar — o app aprende com o tempo.</span>
 
-          <label class="label" for="preset-walk-time">Tempo de Caminhada até o Ponto (Minutos)</label>
-          <input type="number" id="preset-walk-time" class="input" min="0" value="10" placeholder="Ex: 10" required />
-          <span class="field-hint">Quantos minutos você leva de casa até o ponto de ônibus andando?</span>
-
-          <label class="label" for="preset-trip-duration">Tempo de Viagem no Ônibus (Minutos)</label>
-          <input type="number" id="preset-trip-duration" class="input" min="0" value="25" placeholder="Ex: 25" required />
-          <span class="field-hint">Quantos minutos dentro do ônibus do seu ponto até o destino?</span>
-
-          <label class="label" for="preset-buffer-time">Margem de Segurança (Minutos)</label>
-          <input type="number" id="preset-buffer-time" class="input" min="0" value="5" placeholder="Ex: 5" required />
-          <span class="field-hint">Quantos minutos antes você quer chegar no ponto por garantia?</span>
 
           <label class="label" for="preset-schedule-select">Horário de Costume (Opcional)</label>
           <select class="select" id="preset-schedule-select">
@@ -591,7 +577,7 @@ async function setupSchedulesTab(): Promise<void> {
 
     // Divide as linhas de texto, remove vazios e valida o formato HH:MM
     const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    const timeRegex = /^\d{2}:\d{2}$/;
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
     
     let addedCount = 0;
     let errorCount = 0;
@@ -700,10 +686,6 @@ async function setupPresetsTab(): Promise<void> {
   const lineSelect = document.getElementById('preset-line-select') as HTMLSelectElement;
   const boardingSelect = document.getElementById('preset-boarding-select') as HTMLSelectElement;
   const destinationSelect = document.getElementById('preset-destination-select') as HTMLSelectElement;
-  const offsetInput = document.getElementById('preset-boarding-offset') as HTMLInputElement;
-  const walkTimeInput = document.getElementById('preset-walk-time') as HTMLInputElement;
-  const durationInput = document.getElementById('preset-trip-duration') as HTMLInputElement;
-  const bufferInput = document.getElementById('preset-buffer-time') as HTMLInputElement;
   const cancelBtn = document.getElementById('btn-cancel-preset') as HTMLButtonElement;
   const submitBtn = document.getElementById('btn-save-preset') as HTMLButtonElement;
   const formTitle = document.getElementById('preset-form-title') as HTMLElement;
@@ -754,10 +736,6 @@ async function setupPresetsTab(): Promise<void> {
     const lineId = lineSelect.value;
     const boardingStopId = boardingSelect.value;
     const destinationStopId = destinationSelect.value;
-    const estimatedBoardingOffset = parseInt(offsetInput.value, 10);
-    const walkTimeToStop = parseInt(walkTimeInput.value, 10) || 10;
-    const estimatedTripDuration = parseInt(durationInput.value, 10);
-    const bufferTime = parseInt(bufferInput.value, 10) || 0;
 
     const scheduleSelect = document.getElementById('preset-schedule-select') as HTMLSelectElement;
     const preferredScheduleId = scheduleSelect && scheduleSelect.value !== 'none' ? scheduleSelect.value : undefined;
@@ -779,10 +757,6 @@ async function setupPresetsTab(): Promise<void> {
       lineId,
       boardingStopId,
       destinationStopId,
-      estimatedBoardingOffset,
-      walkTimeToStop,
-      estimatedTripDuration,
-      bufferTime,
       preferredScheduleId
     };
 
@@ -933,8 +907,7 @@ async function renderPresetsList(): Promise<void> {
     const trashIconSvg = getIcon('trash', 14);
 
     const preferredSchedule = schedules.find(s => s.id === preset.preferredScheduleId);
-    const scheduleInfo = preferredSchedule ? ` | Costume: ${preferredSchedule.departureTime}` : '';
-    const bufferInfo = (preset.bufferTime ? ` | Margem: ${preset.bufferTime} min` : '') + scheduleInfo;
+    const bufferInfo = preferredSchedule ? ` | Costume: ${preferredSchedule.departureTime}` : '';
 
     return `
       <div class="list-item" style="align-items: flex-start; padding: 12px;">
@@ -967,10 +940,7 @@ async function renderPresetsList(): Promise<void> {
         (document.getElementById('preset-line-select') as HTMLSelectElement).value = preset.lineId;
         (document.getElementById('preset-boarding-select') as HTMLSelectElement).value = preset.boardingStopId;
         (document.getElementById('preset-destination-select') as HTMLSelectElement).value = preset.destinationStopId;
-        (document.getElementById('preset-boarding-offset') as HTMLInputElement).value = preset.estimatedBoardingOffset.toString();
-        (document.getElementById('preset-walk-time') as HTMLInputElement).value = (preset.walkTimeToStop ?? 10).toString();
-        (document.getElementById('preset-trip-duration') as HTMLInputElement).value = preset.estimatedTripDuration.toString();
-        (document.getElementById('preset-buffer-time') as HTMLInputElement).value = (preset.bufferTime ?? 0).toString();
+
 
         // Carrega o dropdown de horários de costume com a linha do preset e seleciona o correto
         await populatePresetScheduleDropdown(preset.lineId, preset.preferredScheduleId);

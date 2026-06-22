@@ -4,7 +4,7 @@
 
 import { getAll, getSchedulesByLine, getSettings } from '../db/database';
 import { TripRecord, Preset, Schedule, BusLine } from '../types';
-import { calculateOverallStats, calculatePredictionAccuracy } from '../services/statistics';
+import { calculateOverallStats, calculatePredictionAccuracy, calculatePresetBaselines, getRecordDelay } from '../services/statistics';
 import { formatMinutes, timeToMinutes, timeDiffMinutes } from '../utils/time';
 import { getIcon } from '../components/icons';
 import { getTimeBand } from '../services/prediction-utils';
@@ -138,6 +138,8 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
     getAll<Preset>('presets'),
     getAll<Schedule>('schedules')
   ]);
+
+  const baselines = calculatePresetBaselines(records);
 
   if (records.length === 0) {
     const statsIconSvg = getIcon('stats', 36, 'empty-state-icon');
@@ -320,7 +322,7 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
     const tlW = timeChartWidth - tlPaddingL - tlPaddingR;
     const tlH = timeChartHeight - tlPaddingT - tlPaddingB;
 
-    const tripDelays = sortedRecords.map(r => timeDiffMinutes(r.scheduledDeparture, r.busArrivedAt));
+    const tripDelays = sortedRecords.map(r => getRecordDelay(r, baselines));
     const maxTlDelay = Math.max(...tripDelays.map(Math.abs), 5);
 
     const getTlY = (d: number) => tlPaddingT + ((maxTlDelay - d) * tlH) / maxTlDelay;
@@ -337,7 +339,7 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
 
     let pathD = '';
     const pointsHtml = sortedRecords.map((r, idx) => {
-      const delay = timeDiffMinutes(r.scheduledDeparture, r.busArrivedAt);
+      const delay = getRecordDelay(r, baselines);
       const x = getTlX(idx);
       const y = getTlY(delay);
 
@@ -475,7 +477,7 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
   const scW = scatterWidth - scPaddingL - scPaddingR;
   const scH = scatterHeight - scPaddingT - scPaddingB;
 
-  const maxScatterDelay = Math.max(...filteredRecords.map(r => timeDiffMinutes(r.scheduledDeparture, r.busArrivedAt)).map(Math.abs), 10);
+  const maxScatterDelay = Math.max(...filteredRecords.map(r => getRecordDelay(r, baselines)).map(Math.abs), 10);
   
   const getScY = (d: number) => scPaddingT + ((maxScatterDelay - d) * scH) / maxScatterDelay;
   const getScX = (timeStr: string) => {
@@ -504,7 +506,7 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
   }).join('');
 
   const scatterDotsHtml = filteredRecords.map(r => {
-    const delay = timeDiffMinutes(r.scheduledDeparture, r.busArrivedAt);
+    const delay = getRecordDelay(r, baselines);
     const x = getScX(r.scheduledDeparture);
     const y = getScY(Math.max(0, delay)); // plota apenas atrasos positivos pra evitar quebra
     
