@@ -164,7 +164,7 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
   if (presetFilter === 'all') {
     filteredRecords = records;
     schedules = allSchedules;
-    accuracyText = 'N/A na visão geral';
+    accuracyText = 'N/A';
   } else {
     filteredRecords = records.filter(r => r.presetId === presetFilter);
     activePreset = presets.find(p => p.id === presetFilter);
@@ -237,7 +237,7 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
     ? `+${stats.avgDelay.toFixed(1)} min` 
     : stats.avgDelay < 0 
       ? `${stats.avgDelay.toFixed(1)} min` 
-      : 'No horário';
+      : '0 min';
 
   // Formata o tempo médio de viagem
   const avgDurationText = stats.avgTripDuration !== null
@@ -574,8 +574,8 @@ async function renderStatsContent(presetFilter: string): Promise<void> {
 
       <div class="stat-card" style="padding: 12px 14px;">
         <span class="stat-label">Precisão IA</span>
-        <span class="stat-value" style="color: var(--accent);">${accuracyText}</span>
-        <span class="stat-meta">margem de até 3min</span>
+        <span class="stat-value" style="color: var(--text-secondary);">${accuracyText}</span>
+        <span class="stat-meta">${presetFilter === 'all' ? 'selecione um trajeto' : 'margem de até 3min'}</span>
       </div>
     </div>
 
