@@ -20,6 +20,24 @@ let activeTripRecord: TripRecord | null = null;
 // Objeto na memória para evitar múltiplos disparos de notificação para a mesma viagem no mesmo dia
 const notifiedTrips: Record<string, boolean> = {};
 
+// Cache do estado atual para evitar rebuilds desnecessários no tick
+let lastRenderedState: {
+  presetId: string;
+  scheduledDeparture: string;
+  isTripInProgress: boolean;
+  predictionsCount: number;
+} | null = null;
+
+// Cache dos dados carregados para reutilizar no tick sem recarregar do DB
+let cachedTickData: {
+  preset: Preset;
+  line: BusLine;
+  boardingStop: BusStop;
+  destinationStop: BusStop;
+  schedules: Schedule[];
+  presetRecords: TripRecord[];
+} | null = null;
+
 /**
  * Renderiza o HTML esqueleto da página Home.
  * 
@@ -228,8 +246,10 @@ export async function initHomePage(): Promise<void> {
     const selectedId = presetSelector.value;
     await saveSettings({ activePresetId: selectedId });
     
-    // Reseta o registro ativo e atualiza visual do sino
+    // Reseta o registro ativo, cache e atualiza visual do sino
     activeTripRecord = null;
+    lastRenderedState = null;
+    cachedTickData = null;
     updateNotifyButtonState(selectedId);
     await updateTrackerView(selectedId);
   });
@@ -283,12 +303,9 @@ export async function initHomePage(): Promise<void> {
     (window as any).boraBusCountdownInterval = null;
   }
 
-  // Define um intervalo para atualizar o countdown a cada segundo
-  const intervalId = window.setInterval(async () => {
-    const currentSettings = await getSettings();
-    if (currentSettings.activePresetId) {
-      await updateTrackerView(currentSettings.activePresetId);
-    }
+  // Define um intervalo para atualizar apenas os valores dinâmicos (sem reconstruir DOM)
+  const intervalId = window.setInterval(() => {
+    tickUpdate();
   }, 1000);
 
   // Compartilha o ID do timer globalmente
@@ -447,11 +464,11 @@ async function updateTrackerView(presetId: string): Promise<void> {
   // Calcula os minutos restantes até a chegada prevista
   const minutesLeft = minutesUntilArrival(prediction);
 
-  // Calcula margem de segurança (Buffer Time)
+  // Calcula margem de segurança — usa walkTimeToStop (caminhada) + buffer (margem)
   const buffer = preset.bufferTime ?? 0;
-  const walkTime = preset.estimatedBoardingOffset;
-  const totalOffset = walkTime + buffer;
-  const timeToLeave = addMinutes(prediction.predictedBusArrival, -totalOffset);
+  const walkTime = preset.walkTimeToStop ?? 10;
+  const totalLeaveOffset = walkTime + buffer;
+  const timeToLeave = addMinutes(prediction.predictedBusArrival, -totalLeaveOffset);
   const minutesToLeave = timeDiffMinutes(currentTime(), timeToLeave);
 
   // Lógica de Notificações Inteligentes (Offline e Background via Service Worker)
@@ -503,10 +520,23 @@ async function updateTrackerView(presetId: string): Promise<void> {
     localStorage.removeItem(`alarm-scheduled-${preset.id}`);
   }
 
+  // Calcula se há viagem em andamento (precisa vir antes do cache)
+  const isTripInProgress = activeTripRecord !== null;
+
+  // Salva o estado atual para o tick detectar mudanças estruturais
+  lastRenderedState = {
+    presetId,
+    scheduledDeparture: prediction.scheduledDeparture,
+    isTripInProgress,
+    predictionsCount: predictions.length
+  };
+
+  // Salva dados carregados em cache para reutilizar no tick sem recarregar do DB
+  cachedTickData = { preset, line, boardingStop, destinationStop, schedules, presetRecords };
+
   // Renderiza os componentes de UI
   const countdownHtml = renderCountdown(minutesLeft);
   const confidenceHtml = renderConfidence(prediction.confidence, prediction.recordCount, prediction.reliability);
-  const isTripInProgress = activeTripRecord !== null;
 
   // Renderização da seção recomendada de saída
   let leaveHtml = '';
@@ -534,17 +564,17 @@ async function updateTrackerView(presetId: string): Promise<void> {
     }
 
     leaveHtml = `
-      <div class="card countdown-container ${pulseClass}" style="background-color: var(--bg); margin: 0 0 16px 0; padding: 12px 14px; border-radius: var(--radius); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+      <div id="leave-card" class="card countdown-container ${pulseClass}" style="background-color: var(--bg); margin: 0 0 16px 0; padding: 12px 14px; border-radius: var(--radius); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="color: var(--accent); display: flex;">${getIcon('clock', 20)}</span>
           <div>
             <span class="label" style="font-size: 9px; margin-bottom: 0; letter-spacing: 0.02em;">Sair de Casa às</span>
-            <strong style="font-size: 15px; color: var(--text);">${timeToLeave}</strong>
+            <strong id="leave-time-value" style="font-size: 15px; color: var(--text);">${timeToLeave}</strong>
           </div>
         </div>
         <div style="text-align: right;">
-          <span style="font-size: 10px; color: var(--text-secondary); display: block; margin-bottom: 2px;">Buffer: ${buffer}m | Caminhada: ${walkTime}m</span>
-          <strong style="font-size: 13px; color: ${leaveColorStyle};">${leaveStatusText}</strong>
+          <span style="font-size: 10px; color: var(--text-secondary); display: block; margin-bottom: 2px;">Margem: ${buffer}m | Caminhada: ${walkTime}m</span>
+          <strong id="leave-status-text" style="font-size: 13px; color: ${leaveColorStyle};">${leaveStatusText}</strong>
         </div>
       </div>
     `;
@@ -554,18 +584,18 @@ async function updateTrackerView(presetId: string): Promise<void> {
   let nextBusesGridHtml = '';
   if (predictions.length > 1) {
     const extraPredictions = predictions.slice(1);
-    const cols = extraPredictions.map(pred => {
+    const cols = extraPredictions.map((pred, idx) => {
       const minLeft = timeDiffMinutes(currentTime(), pred.predictedBusArrival);
       const confColor = pred.confidence >= 75 ? 'var(--success)' : pred.confidence >= 40 ? 'var(--warning)' : 'var(--danger)';
       return `
-        <div class="card" style="margin-bottom: 0; padding: 10px 12px; background-color: var(--surface); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px;">
+        <div class="card" data-next-bus-index="${idx}" style="margin-bottom: 0; padding: 10px 12px; background-color: var(--surface); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px;">
           <span class="label" style="font-size: 8px; margin-bottom: 0; letter-spacing: 0.03em; color: var(--text-secondary);">Na sequência</span>
           <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 4px;">
             <strong style="font-size: 14px; color: var(--text);">~${pred.predictedBusArrival}</strong>
             <span style="font-size: 11px; color: var(--text-secondary); font-family: monospace;">Tabela: ${pred.scheduledDeparture}</span>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; font-size: 10px;">
-            <span style="color: var(--text-secondary); display: flex; align-items: center; gap: 2px;">
+            <span class="next-bus-time" style="color: var(--text-secondary); display: flex; align-items: center; gap: 2px;">
               ${getIcon('clock', 10)} em ${minLeft} min
             </span>
             <span style="font-weight: 600; color: ${confColor};">
@@ -758,4 +788,141 @@ async function updateTrackerView(presetId: string): Promise<void> {
       await updateTrackerView(presetId);
     });
   }
+}
+
+/**
+ * Atualização leve chamada pelo setInterval a cada segundo.
+ * Recalcula apenas os valores de texto dinâmicos (countdown, status de saída)
+ * sem reconstruir o DOM inteiro. Se detectar mudança estrutural, chama render completo.
+ */
+function tickUpdate(): void {
+  // Se não há estado renderizado ou dados em cache, não faz nada
+  if (!lastRenderedState || !cachedTickData) return;
+
+  const { preset, schedules, presetRecords } = cachedTickData;
+  const currentDayType = detectDayType(new Date());
+
+  // Recalcula a previsão atual
+  let prediction: Prediction | null = null;
+  let predictions: Prediction[] = [];
+
+  if (preset.preferredScheduleId && preset.preferredScheduleId !== 'none') {
+    const preferredSchedule = schedules.find(s => s.id === preset.preferredScheduleId);
+    if (preferredSchedule && preferredSchedule.dayType === currentDayType) {
+      prediction = predictArrival(preferredSchedule, preset, presetRecords);
+      predictions = findNextBuses(preset, schedules, presetRecords, currentDayType, 3, preferredSchedule.departureTime);
+      if (predictions.length === 0 || predictions[0].scheduledDeparture !== preferredSchedule.departureTime) {
+        predictions.unshift(prediction);
+      }
+    }
+  }
+
+  if (!prediction) {
+    predictions = findNextBuses(preset, schedules, presetRecords, currentDayType, 3);
+    prediction = predictions[0] || null;
+  }
+
+  if (!prediction) return;
+
+  // Verifica se houve mudança estrutural (ônibus mudou, viagem começou/terminou)
+  const isTripInProgress = activeTripRecord !== null;
+  if (
+    lastRenderedState.scheduledDeparture !== prediction.scheduledDeparture ||
+    lastRenderedState.isTripInProgress !== isTripInProgress ||
+    lastRenderedState.predictionsCount !== predictions.length
+  ) {
+    // Mudança estrutural — rebuild completo
+    updateTrackerView(lastRenderedState.presetId);
+    return;
+  }
+
+  // --- Atualização leve: só textos dinâmicos ---
+
+  const minutesLeft = minutesUntilArrival(prediction);
+
+  // Atualiza o countdown principal
+  const countdownEl = document.querySelector('.countdown') as HTMLElement;
+  if (countdownEl) {
+    let displayValue = '';
+    let colorClass = 'green';
+
+    if (minutesLeft < 0) {
+      displayValue = 'Passou';
+      colorClass = 'red';
+    } else if (minutesLeft === 0) {
+      displayValue = 'Agora!';
+      colorClass = 'red';
+    } else if (minutesLeft > 60) {
+      const hours = Math.floor(minutesLeft / 60);
+      const remainingMinutes = minutesLeft % 60;
+      displayValue = `${hours}h ${remainingMinutes}min`;
+      colorClass = 'green';
+    } else {
+      displayValue = `${minutesLeft} min`;
+      if (minutesLeft < 5) colorClass = 'red';
+      else if (minutesLeft <= 10) colorClass = 'yellow';
+    }
+
+    countdownEl.textContent = displayValue;
+    countdownEl.className = `countdown ${colorClass}`;
+  }
+
+  // Atualiza o card de "hora de sair"
+  if (!isTripInProgress && minutesLeft > 0) {
+    const buffer = preset.bufferTime ?? 0;
+    const walkTime = preset.walkTimeToStop ?? 10;
+    const totalLeaveOffset = walkTime + buffer;
+    const timeToLeave = addMinutes(prediction.predictedBusArrival, -totalLeaveOffset);
+    const minutesToLeave = timeDiffMinutes(currentTime(), timeToLeave);
+
+    const leaveTimeEl = document.getElementById('leave-time-value');
+    const leaveStatusEl = document.getElementById('leave-status-text');
+    const leaveCard = document.getElementById('leave-card');
+
+    if (leaveTimeEl) leaveTimeEl.textContent = timeToLeave;
+
+    if (leaveStatusEl) {
+      let leaveStatusText = '';
+      let leaveColorStyle = 'var(--success)';
+      let pulseClass = 'pulse-green';
+
+      if (minutesToLeave < 0) {
+        leaveStatusText = 'Atrasado! Vá correndo';
+        leaveColorStyle = 'var(--danger)';
+        pulseClass = 'pulse-red';
+      } else if (minutesToLeave === 0) {
+        leaveStatusText = 'Saia agora!';
+        leaveColorStyle = 'var(--warning)';
+        pulseClass = 'pulse-yellow';
+      } else if (minutesToLeave <= 3) {
+        leaveStatusText = `Saia em ${minutesToLeave} min`;
+        leaveColorStyle = 'var(--warning)';
+        pulseClass = 'pulse-yellow';
+      } else {
+        leaveStatusText = `Saia em ${minutesToLeave} min`;
+        leaveColorStyle = 'var(--success)';
+        pulseClass = 'pulse-green';
+      }
+
+      leaveStatusEl.textContent = leaveStatusText;
+      leaveStatusEl.style.color = leaveColorStyle;
+
+      // Atualiza a classe de pulso no card
+      if (leaveCard) {
+        leaveCard.className = `card countdown-container ${pulseClass}`;
+      }
+    }
+  }
+
+  // Atualiza os cards de "próximos ônibus" (minutos restantes)
+  const nextBusCards = document.querySelectorAll('[data-next-bus-index]');
+  const extraPredictions = predictions.slice(1);
+  nextBusCards.forEach((card, i) => {
+    if (i < extraPredictions.length) {
+      const pred = extraPredictions[i];
+      const minLeft = timeDiffMinutes(currentTime(), pred.predictedBusArrival);
+      const timeSpan = card.querySelector('.next-bus-time') as HTMLElement;
+      if (timeSpan) timeSpan.textContent = `em ${minLeft} min`;
+    }
+  });
 }

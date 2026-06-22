@@ -165,6 +165,17 @@ p {
   letter-spacing: 0.05em;
 }
 
+/* Texto de ajuda abaixo de campos de formulário */
+.field-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: -12px;
+  margin-bottom: 16px;
+  line-height: 1.4;
+  opacity: 0.7;
+}
+
 .input,
 .select {
   width: 100%;
