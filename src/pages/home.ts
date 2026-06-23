@@ -598,7 +598,7 @@ async function updateTrackerView(presetId: string): Promise<void> {
       ${countdownHtml}
 
       <!-- Horários previstos com intervalo de confiança -->
-      ${renderConfidenceInterval(prediction.predictedBusArrival, prediction.confidenceInterval)}
+      ${renderConfidenceInterval(prediction.predictedBusArrival, prediction.confidenceInterval, prediction.confidence)}
 
       <div style="background-color: rgba(0, 0, 0, 0.15); margin: 0 0 16px 0; padding: 14px; border-radius: var(--radius); border: 1px solid var(--border);">
         <div style="display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center;">

@@ -16,28 +16,29 @@ import type { ConfidenceInterval } from '../types'
  */
 export function renderConfidenceInterval(
   predicted: string,
-  interval: ConfidenceInterval
+  interval: ConfidenceInterval,
+  confidenceScore: number = 100
 ): string {
-  // Determina cor baseada na largura do intervalo
+  // Determina cor baseada na largura do intervalo E na confiança geral
   let barColor: string
   let barBgColor: string
   let label: string
 
-  if (interval.spreadMinutes <= 6) {
-    // Intervalo estreito = previsão precisa
-    barColor = 'var(--success)'
-    barBgColor = 'rgba(34, 197, 94, 0.15)'
-    label = 'Alta precisão'
-  } else if (interval.spreadMinutes <= 12) {
-    // Intervalo médio
+  if (confidenceScore < 30 || interval.spreadMinutes > 12) {
+    // Baixa confiança (ex: cold start) ou intervalo muito largo
+    barColor = 'var(--danger)'
+    barBgColor = 'rgba(239, 68, 68, 0.15)'
+    label = 'Alta incerteza'
+  } else if (confidenceScore < 70 || interval.spreadMinutes > 6) {
+    // Confiança moderada ou intervalo médio
     barColor = 'var(--warning)'
     barBgColor = 'rgba(234, 179, 8, 0.15)'
     label = 'Precisão moderada'
   } else {
-    // Intervalo largo = muita incerteza
-    barColor = 'var(--danger)'
-    barBgColor = 'rgba(239, 68, 68, 0.15)'
-    label = 'Alta incerteza'
+    // Alta confiança e intervalo estreito
+    barColor = 'var(--success)'
+    barBgColor = 'rgba(34, 197, 94, 0.15)'
+    label = 'Alta precisão'
   }
 
   // Calcula a posição visual do marcador central (ponto previsto)
